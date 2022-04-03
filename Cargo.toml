@@ -1,8 +1,10 @@
-[package]
-name = "manes"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["src/manes"]
+default-members = ["src/manes"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.dev]
+panic = "abort"
 
-[dependencies]
+[profile.release]
+panic = "abort"
+lto = true
