@@ -6,10 +6,11 @@ mod unofficial;
 use super::Mos6502;
 use control::*;
 use alu::*;
+use bus::Bus;
 use rmw::*;
 use unofficial::*;
 
-type OpcodeFunction = fn(&mut Mos6502, AddressingMode);
+type OpcodeFunction = fn(&mut Mos6502, AddressingMode, &Bus);
 
 pub struct Instruction {
     opcode: u8,

@@ -1,5 +1,6 @@
 mod opcodes;
 
+use bus::Bus;
 use opcodes::{Instruction, AddressingMode, parse_instruction};
 
 #[derive(Debug)]
@@ -25,8 +26,8 @@ impl Mos6502 {
         }
     }
 
-    pub fn execute_instruction(&mut self, opcode: u8) {
+    pub fn execute_instruction(&mut self, opcode: u8, bus: &Bus) {
         let inst = parse_instruction(opcode);
-        (inst.function)(self, inst.addressing_mode); 
+        (inst.function)(self, inst.addressing_mode, bus);
     }
 }
