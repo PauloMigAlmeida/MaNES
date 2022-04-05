@@ -1,65 +1,32 @@
-enum AddressingMode {
-    Implicit,
-    Accumulator,
-    Immediate,
-    ZeroPage,
-    ZeroPageX,
-    ZeroPageY,
-    Relative,
-    Absolute,
-    AbsoluteX,
-    AbsoluteY,
-    Indirect,
-    IndirectX,
-    IndirectY,
+mod opcodes;
+
+use opcodes::{Instruction, AddressingMode, parse_instruction};
+
+#[derive(Debug)]
+pub struct Mos6502 {
+    reg_a: u8,
+    reg_x: u8,
+    reg_y: u8,
+    pc: u16,
+    sp: u8,
+    st_flags: u8,
 }
 
-struct Instruction {
-    opcode: u8,
-    name: String,
-    cycles: u8,
-    addressing_mode: AddressingMode,
-    bytes: u8,
-    page_cross_add_cycle: bool,
-}
-
-fn parse_instruction(opcode: u8) -> Instruction {
-    match opcode {
-        0x0 => Instruction {
-            opcode,
-            name: String::from("BRK"),
-            cycles: 7,
-            addressing_mode: AddressingMode::Implicit,
-            bytes: 1,
-            page_cross_add_cycle: false,
-        },
-        0x1 => Instruction {
-            opcode,
-            name: String::from("ORA"),
-            cycles: 6,
-            addressing_mode: AddressingMode::IndirectX,
-            bytes: 2,
-            page_cross_add_cycle: false,
-        },
-        0x2 => Instruction {
-            opcode,
-            name: String::from("NOP"),
-            cycles: 2,
-            addressing_mode: AddressingMode::Immediate,
-            bytes: 1,
-            page_cross_add_cycle: false,
-        },
-        _ => panic!("opcode: {} is not valid", opcode)
+impl Mos6502 {
+    pub fn new() -> Self {
+        //TODO find out default values for the CPU
+        Mos6502 {
+            reg_a: 0x0,
+            reg_x: 0x0,
+            reg_y: 0x0,
+            pc: 0x0,
+            sp: 0x0,
+            st_flags: 0x0,
+        }
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_brk() {
-        let result = parse_instruction(0x0);
-        assert_eq!(result.name, "BRK");
+    pub fn execute_instruction(&mut self, opcode: u8) {
+        let inst = parse_instruction(opcode);
+        (inst.function)(self, inst.addressing_mode); 
     }
 }
