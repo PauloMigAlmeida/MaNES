@@ -2,7 +2,7 @@
 MaNES is an experimental NES emulator written from scratch in Rust. This is work in progress and I would expect something to have it "finalised" by the end of 2022.
 
 ## What MaNES stands for?
-I'm paying homage to my grandfather whose name is Manoel which the short version of itis "Mane".  In some contexts "Mane" is used as an derrogatory term to indicate that someone is stupid. 
+I'm paying homage to my grandfather whose name is Manoel so "Mane" is the short version of it. In some contexts "Mane" is used as a derogatory term to indicate that someone is stupid. 
 
 My grandfather has always been my role model and extremely versatile. There is not a thing that he wasn't able to fix/amend due to his restless curiosity which is even more impressive when you take into account that his was pretty much illiterate. 
 
