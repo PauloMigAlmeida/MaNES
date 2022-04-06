@@ -9,20 +9,21 @@ use alu::*;
 use bus::Bus;
 use rmw::*;
 use unofficial::*;
+use AddressingMode::*;
 
 type OpcodeFunction = fn(&mut Mos6502, AddressingMode, &Bus);
 
-pub struct Instruction {
+#[derive(Copy, Clone)]
+pub struct Instruction<'a> {
     opcode: u8,
-    name: String,
+    name: &'a str,
     cycles: u8,
     pub addressing_mode: AddressingMode,
     bytes: u8,
-    page_cross_add_cycle: bool,
     pub function: OpcodeFunction,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum AddressingMode {
     Implicit,
     Accumulator,
@@ -39,37 +40,46 @@ pub enum AddressingMode {
     IndirectY,
 }
 
-pub fn parse_instruction(opcode: u8) -> Instruction {
-    match opcode {
-        0x0 => Instruction {
-            opcode,
-            name: String::from("BRK"),
-            cycles: 7,
-            addressing_mode: AddressingMode::Implicit,
-            bytes: 1,
-            page_cross_add_cycle: false,
-            function: brk,
-        },
-        0x1 => Instruction {
-            opcode,
-            name: String::from("ORA"),
-            cycles: 6,
-            addressing_mode: AddressingMode::IndirectX,
-            bytes: 2,
-            page_cross_add_cycle: false,
-            function: brk,
-        },
-        0x2 => Instruction {
-            opcode,
-            name: String::from("NOP"),
-            cycles: 2,
-            addressing_mode: AddressingMode::Immediate,
-            bytes: 1,
-            page_cross_add_cycle: false,
-            function: brk,
-        },
-        _ => panic!("opcode: {} is not valid", opcode)
-    }
+static OPTABLE: [Instruction; 256] = [
+    // 0
+    Instruction { opcode: 0x00, name: "BRK", cycles: 7, addressing_mode: Implicit,    bytes: 1, function: brk },
+    Instruction { opcode: 0x01, name: "ORA", cycles: 6, addressing_mode: IndirectX,   bytes: 2, function: ora },
+    Instruction { opcode: 0x02, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x03, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x04, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x05, name: "ORA", cycles: 3, addressing_mode: ZeroPage,    bytes: 2, function: ora },
+    Instruction { opcode: 0x06, name: "ASL", cycles: 5, addressing_mode: ZeroPage,    bytes: 2, function: asl },
+    Instruction { opcode: 0x07, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x08, name: "PHP", cycles: 3, addressing_mode: Implicit,    bytes: 1, function: php },
+    Instruction { opcode: 0x09, name: "ORA", cycles: 2, addressing_mode: Immediate,   bytes: 2, function: ora },
+    Instruction { opcode: 0x0a, name: "ASL", cycles: 2, addressing_mode: Accumulator, bytes: 1, function: asl },
+    Instruction { opcode: 0x0b, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x0c, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x0d, name: "ORA", cycles: 4, addressing_mode: Absolute,    bytes: 3, function: ora },
+    Instruction { opcode: 0x0e, name: "ASL", cycles: 6, addressing_mode: Absolute,    bytes: 3, function: ora },
+    Instruction { opcode: 0x0f, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    // 16
+    Instruction { opcode: 0x10, name: "BPL", cycles: 2, addressing_mode: Relative,    bytes: 2, function: bpl },
+    Instruction { opcode: 0x11, name: "ORA", cycles: 5, addressing_mode: IndirectY,   bytes: 2, function: ora },
+    Instruction { opcode: 0x12, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x13, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x14, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x15, name: "ORA", cycles: 4, addressing_mode: ZeroPageX,   bytes: 2, function: ora },
+    Instruction { opcode: 0x16, name: "ASL", cycles: 6, addressing_mode: ZeroPageX,   bytes: 2, function: asl },
+    Instruction { opcode: 0x17, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x18, name: "CLC", cycles: 2, addressing_mode: Implicit,    bytes: 1, function: clc },
+    Instruction { opcode: 0x19, name: "ORA", cycles: 4, addressing_mode: AbsoluteY,   bytes: 3, function: ora },
+    Instruction { opcode: 0x1a, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x1b, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x1c, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x1d, name: "ORA", cycles: 4, addressing_mode: AbsoluteX,   bytes: 3, function: ora },
+    Instruction { opcode: 0x1e, name: "ASL", cycles: 7, addressing_mode: AbsoluteX,   bytes: 3, function: asl },
+    Instruction { opcode: 0x1f, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+];
+
+
+pub fn parse_instruction(opcode: u8) -> Instruction<'static> {
+    OPTABLE[opcode as usize]
 }
 
 #[cfg(test)]

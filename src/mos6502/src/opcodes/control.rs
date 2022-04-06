@@ -25,6 +25,6 @@ mod tests {
     fn test_brk() {
         let (mut cpu, bus) = init();
         cpu.execute_instruction(0x00, &bus);
-        assert_eq!(cpu.reg_a, 0x00);
+        assert_eq!(cpu.a, 0x00);
     }
 }
