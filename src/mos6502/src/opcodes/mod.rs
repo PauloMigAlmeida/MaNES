@@ -75,6 +75,23 @@ static OPTABLE: [Instruction; 256] = [
     Instruction { opcode: 0x1d, name: "ORA", cycles: 4, addressing_mode: AbsoluteX,   bytes: 3, function: ora },
     Instruction { opcode: 0x1e, name: "ASL", cycles: 7, addressing_mode: AbsoluteX,   bytes: 3, function: asl },
     Instruction { opcode: 0x1f, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    // 32
+    Instruction { opcode: 0x20, name: "JSR", cycles: 2, addressing_mode: Relative,    bytes: 2, function: jsr },
+    Instruction { opcode: 0x21, name: "AND", cycles: 6, addressing_mode: IndirectY,   bytes: 2, function: and },
+    Instruction { opcode: 0x22, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x23, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x24, name: "BIT", cycles: 3, addressing_mode: ZeroPage,    bytes: 2, function: bit },
+    Instruction { opcode: 0x25, name: "AND", cycles: 3, addressing_mode: ZeroPage,    bytes: 2, function: and },
+    Instruction { opcode: 0x26, name: "ROL", cycles: 5, addressing_mode: ZeroPage,    bytes: 2, function: rol },
+    Instruction { opcode: 0x27, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x28, name: "PLP", cycles: 4, addressing_mode: Implicit,    bytes: 1, function: plp },
+    Instruction { opcode: 0x29, name: "AND", cycles: 2, addressing_mode: Immediate,   bytes: 2, function: and },
+    Instruction { opcode: 0x2a, name: "ROL", cycles: 2, addressing_mode: Accumulator, bytes: 2, function: rol },
+    Instruction { opcode: 0x2b, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
+    Instruction { opcode: 0x2c, name: "BIT", cycles: 4, addressing_mode: Absolute,    bytes: 3, function: bit },
+    Instruction { opcode: 0x2d, name: "AND", cycles: 4, addressing_mode: Absolute,    bytes: 3, function: and },
+    Instruction { opcode: 0x2e, name: "ROL", cycles: 6, addressing_mode: Absolute,    bytes: 3, function: rol },
+    Instruction { opcode: 0x2f, name: "IVL", cycles: 0, addressing_mode: Implicit,    bytes: 0, function: invalid },
 ];
 
 
