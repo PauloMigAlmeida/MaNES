@@ -41,7 +41,7 @@ pub enum AddressingMode {
     Invalid, // doesn't exist in 6502. I use that for illegal/unimplemented opcodes
 }
 
-static OPTABLE: [Instruction; 256] = [
+const OPTABLE: [Instruction; 128] = [
     Instruction { opcode: 0x00, name: "BRK", mode: Implicit,    bytes: 1, cycles: 7, function: brk },
     Instruction { opcode: 0x01, name: "ORA", mode: IndirectX,   bytes: 2, cycles: 6, function: ora },
     Instruction { opcode: 0x02, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
