@@ -41,7 +41,7 @@ pub enum AddressingMode {
     Invalid, // doesn't exist in 6502. I use that for illegal/unimplemented opcodes
 }
 
-const OPTABLE: [Instruction; 128] = [
+const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x00, name: "BRK", mode: Implicit,    bytes: 1, cycles: 7, function: brk },
     Instruction { opcode: 0x01, name: "ORA", mode: IndirectX,   bytes: 2, cycles: 6, function: ora },
     Instruction { opcode: 0x02, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
@@ -177,6 +177,40 @@ const OPTABLE: [Instruction; 128] = [
     Instruction { opcode: 0x7d, name: "ADC", mode: AbsoluteX,   bytes: 3, cycles: 4, function: adc },
     Instruction { opcode: 0x7e, name: "ROR", mode: AbsoluteX,   bytes: 3, cycles: 7, function: ror },
     Instruction { opcode: 0x7f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+
+    Instruction { opcode: 0x80, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x81, name: "STA", mode: IndirectX,   bytes: 2, cycles: 6, function: sta },
+    Instruction { opcode: 0x82, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x83, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x84, name: "STI", mode: ZeroPage,    bytes: 2, cycles: 3, function: sty },
+    Instruction { opcode: 0x85, name: "STA", mode: ZeroPage,    bytes: 2, cycles: 3, function: sta },
+    Instruction { opcode: 0x86, name: "STX", mode: ZeroPage,    bytes: 2, cycles: 3, function: stx },
+    Instruction { opcode: 0x87, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x88, name: "DEY", mode: Implicit     bytes: 1, cycles: 2, function: dey },
+    Instruction { opcode: 0x89, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x8a, name: "TXA", mode: Implicit     bytes: 1, cycles: 2, function: txa },
+    Instruction { opcode: 0x8b, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x8c, name: "STY", mode: Absolute     bytes: 3, cycles: 4, function: sty },
+    Instruction { opcode: 0x8d, name: "STA", mode: Absolute     bytes: 3, cycles: 4, function: sta },
+    Instruction { opcode: 0x8e, name: "STX", mode: Absolute     bytes: 3, cycles: 4, function: sta },
+    Instruction { opcode: 0x8f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+
+    Instruction { opcode: 0x90, name: "BCC", mode: Relative,    bytes: 2, cycles: 2, function: bcc },
+    Instruction { opcode: 0x91, name: "STA", mode: IndirectY,   bytes: 2, cycles: 6, function: sta },
+    Instruction { opcode: 0x92, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x93, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x94, name: "STY", mode: ZeroPageX,   bytes: 2, cycles: 4, function: sty },
+    Instruction { opcode: 0x95, name: "STA", mode: ZeroPageX,   bytes: 2, cycles: 4, function: sta },
+    Instruction { opcode: 0x96, name: "STX", mode: ZeroPageY,   bytes: 2, cycles: 4, function: stx },
+    Instruction { opcode: 0x97, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x98, name: "TYA", mode: Implicit,    bytes: 1, cycles: 2, function: tya },
+    Instruction { opcode: 0x99, name: "STA", mode: AbsoluteY,   bytes: 3, cycles: 5, function: sta },
+    Instruction { opcode: 0x9a, name: "TXS", mode: Implicit,    bytes: 1, cycles: 2, function: txs },
+    Instruction { opcode: 0x9b, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x9c, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x9d, name: "STA", mode: AbsoluteX,   bytes: 3, cycles: 5, function: sta },
+    Instruction { opcode: 0x9e, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
+    Instruction { opcode: 0x9f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
 
 ];
 
