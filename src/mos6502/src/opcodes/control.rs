@@ -80,6 +80,70 @@ pub fn bmi(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("bmi was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
+pub fn sty(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("sty was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn dey(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("dey was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn bcc(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("bcc was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn tya(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("tya was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn ldy(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("ldy was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn tay(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("tay was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn bcs(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("bcs was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn clv(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("clv was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn cpy(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("cpy was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn iny(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("iny was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn bne(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("bne was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn cld(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("cld was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn cpx(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("cpx was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn inx(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("inx was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn beq(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("beq was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
+pub fn sed(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+    println!("sed was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
