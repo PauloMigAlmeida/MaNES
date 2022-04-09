@@ -41,6 +41,16 @@ pub enum AddressingMode {
     Invalid, // doesn't exist in 6502. I use that for illegal/unimplemented opcodes
 }
 
+#[derive(Debug)]
+pub enum Flags {
+    Carry = 0,
+    Zero = 1,
+    Interrupt = 2,
+    Decimal = 3,
+    Overflow = 6,
+    Negative = 7,
+}
+
 const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x00, name: "BRK", mode: Implicit,    bytes: 1, cycles: 7, function: brk },
     Instruction { opcode: 0x01, name: "ORA", mode: IndirectX,   bytes: 2, cycles: 6, function: ora },
@@ -317,7 +327,7 @@ const OPTABLE: [Instruction;256] = [
 
 
 pub fn parse_instruction(opcode: u8) -> Instruction<'static> {
-    OPTABLE[opcode as usize]
+    OPTABLE[opcode as usize].clone()
 }
 
 #[cfg(test)]
