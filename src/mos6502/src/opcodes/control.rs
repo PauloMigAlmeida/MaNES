@@ -1,4 +1,5 @@
 use bus::Bus;
+use super::Flags::*;
 use super::{Mos6502, AddressingMode};
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
@@ -20,20 +21,30 @@ pub fn bpl(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("bpl was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
-pub fn clc(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// CLC - Clear Carry Flag
+/// Set the carry flag to zero.
+pub fn clc(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("clc was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.clear_flag(Carry);
 }
 
 pub fn jmp(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("jmp was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
-pub fn cli(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// CLI - Clear Interrupt Disable
+/// Clears the interrupt disable flag allowing normal interrupt
+/// requests to be serviced.
+pub fn cli(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("cli was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.clear_flag(Interrupt);
 }
 
-pub fn sei(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// SEI - Set Interrupt Disable
+/// Set the interrupt disable flag to one.
+pub fn sei(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("sei was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.set_flag(Interrupt);
 }
 
 pub fn bvs(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
@@ -64,8 +75,11 @@ pub fn rti(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("rti was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
-pub fn sec(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// SEC - Set Carry Flag
+/// Set the carry flag to one.
+pub fn sec(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("sec was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.set_flag(Carry);
 }
 
 pub fn bit(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
@@ -108,8 +122,11 @@ pub fn bcs(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("bcs was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
-pub fn clv(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// CLV - Clear Overflow Flag
+/// Clears the overflow flag.
+pub fn clv(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("clv was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.clear_flag(Overflow);
 }
 
 pub fn cpy(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
@@ -124,8 +141,11 @@ pub fn bne(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("bne was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
-pub fn cld(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// CLD - Clear Decimal Mode
+/// Sets the decimal mode flag to zero.
+pub fn cld(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("cld was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.clear_flag(Decimal);
 }
 
 pub fn cpx(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
@@ -140,8 +160,11 @@ pub fn beq(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
     println!("beq was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
 }
 
-pub fn sed(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &Bus) {
+/// SED - Set Decimal Flag
+/// Set the decimal mode flag to one.
+pub fn sed(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) {
     println!("sed was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.set_flag(Decimal);
 }
 
 #[cfg(test)]
