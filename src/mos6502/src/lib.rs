@@ -118,7 +118,10 @@ mod tests {
         cpu.sp = 0xff;
         cpu.stack_push(0x10, &mut bus);
         assert_eq!(cpu.sp, 0xfe);
+        cpu.stack_push(0x11, &mut bus);
+        assert_eq!(cpu.sp, 0xfd);
         assert_eq!(bus.read_address(STACK_PAGE | 0xff), 0x10);
+        assert_eq!(bus.read_address(STACK_PAGE | 0xfe), 0x11);
     }
 
     #[test]
@@ -138,8 +141,10 @@ mod tests {
 
         cpu.sp = 0xff;
         cpu.stack_push(0x10, &mut bus);
-        let value = cpu.stack_pull(&bus);
-        assert_eq!(value, 0x10);
+        cpu.stack_push(0x11, &mut bus);
+        assert_eq!(cpu.stack_pull(&bus), 0x11);
+        assert_eq!(cpu.sp, 0xfe);
+        assert_eq!(cpu.stack_pull(&bus), 0x10);
         assert_eq!(cpu.sp, 0xff);
     }
 
