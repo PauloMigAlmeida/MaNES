@@ -4,7 +4,7 @@ use super::{Mos6502, AddressingMode};
 /// IVL - Invalid Opcode
 /// It's not my intention to implement unofficial opcodes at this moment
 /// so I will simply panic the execution should I ever see one
-pub fn invalid(_cpu: &mut Mos6502, _addr_mode: AddressingMode, _bus: &Bus) {
+pub fn invalid(_cpu: &mut Mos6502, _addr_mode: AddressingMode, _bus: &Bus) -> u8 {
     panic!("Invalid opcode found... aborting");
 }
 

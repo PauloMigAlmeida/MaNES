@@ -11,13 +11,13 @@ use rmw::*;
 use unofficial::*;
 use AddressingMode::*;
 
-type OpcodeFunction = fn(&mut Mos6502, AddressingMode, &Bus);
+type OpcodeFunction = fn(&mut Mos6502, AddressingMode, &Bus) -> u8;
 
 #[derive(Copy, Clone)]
 pub struct Instruction<'a> {
     opcode: u8,
     name: &'a str,
-    cycles: u8,
+    pub cycles: u8,
     pub mode: AddressingMode,
     bytes: u8,
     pub function: OpcodeFunction,
@@ -51,7 +51,7 @@ pub enum Flags {
     Negative = 7,
 }
 
-const OPTABLE: [Instruction;256] = [
+pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x00, name: "BRK", mode: Implicit,    bytes: 1, cycles: 7, function: brk },
     Instruction { opcode: 0x01, name: "ORA", mode: IndirectX,   bytes: 2, cycles: 6, function: ora },
     Instruction { opcode: 0x02, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },

@@ -26,9 +26,10 @@ impl Mos6502 {
         }
     }
 
-    pub fn execute_instruction(&mut self, opcode: u8, bus: &Bus) {
+    pub fn execute_instruction(&mut self, opcode: u8, bus: &Bus) -> u8 {
         let inst = parse_instruction(opcode);
-        (inst.function)(self, inst.mode, bus);
+        let r = (inst.function)(self, inst.mode, bus);
+        inst.cycles as u8 + r
     }
 
     pub fn set_flag(&mut self, flag: Flags) {
