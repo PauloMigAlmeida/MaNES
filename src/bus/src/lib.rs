@@ -3,19 +3,23 @@
 ///         ranges so we can iterate through the list to find out which of them read/write op is
 ///         meant to be carried out
 
-pub struct Bus { }
+pub struct Bus {
+    ram: [u8; 0x10000]
+}
 
 impl Bus {
     pub fn new() -> Self {
-        Bus{ }
+        Bus{ ram: [0; 0x10000] }
     }
 
-    pub fn read_address(addr: u16) -> u16 {
+    pub fn read_address(&self, addr: u16) -> u8 {
         //TODO implement logic to get data from the right component
-        0
+        let value = self.ram[addr as usize];
+        value
     }
 
-    pub fn write_address(addr: u16) {
+    pub fn write_address(&mut self, addr: u16, value: u8) {
         //TODO implement logic to write data to the right component
+        self.ram[addr as usize] = value;
     }
 }

@@ -3,6 +3,8 @@ mod opcodes;
 use bus::Bus;
 use opcodes::{Instruction, AddressingMode, parse_instruction, Flags};
 
+const STACK_PAGE:u16 = 0x0100;
+
 #[derive(Debug)]
 pub struct Mos6502 {
     a: u8,
@@ -22,6 +24,7 @@ impl Mos6502 {
             y: 0x0,
             pc: 0x0,
             sp: 0xFD,
+            /* offset for the 0x0100 page */
             flags: 0x34,
         }
     }
@@ -43,6 +46,26 @@ impl Mos6502 {
         self.flags &= value;
     }
 
+    pub fn stack_push(&mut self, value: u8, bus: &mut Bus) {
+        if self.sp == 0 {
+            panic!("Can't push more data into the stack");
+        }
+
+        let addr: u16 = STACK_PAGE | self.sp as u16;
+        bus.write_address(addr, value);
+        self.sp -= 1;
+    }
+
+    pub fn stack_pull(&mut self, bus: &Bus) -> u8 {
+        if self.sp == 0xFF {
+            panic!("Can't pull more data from the stack");
+        }
+
+        self.sp += 1;
+        let addr: u16 = STACK_PAGE | self.sp  as u16;
+        let value = bus.read_address(addr);
+        value
+    }
 }
 
 #[cfg(test)]
@@ -85,5 +108,48 @@ mod tests {
         assert_eq!(cpu.flags, 0b1000_0000);
         cpu.clear_flag(Flags::Negative);
         assert_eq!(cpu.flags, 0b0000_0000);
+    }
+
+    #[test]
+    fn test_stack_push() {
+        let mut cpu = Mos6502::new();
+        let mut bus = Bus::new();
+
+        cpu.sp = 0xff;
+        cpu.stack_push(0x10, &mut bus);
+        assert_eq!(cpu.sp, 0xfe);
+        assert_eq!(bus.read_address(STACK_PAGE | 0xff), 0x10);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_stack_push_overflow() {
+        let mut cpu = Mos6502::new();
+        let mut bus = Bus::new();
+
+        cpu.sp = 0x00;
+        cpu.stack_push(0x10, &mut bus);
+    }
+
+    #[test]
+    fn test_stack_pull() {
+        let mut cpu = Mos6502::new();
+        let mut bus = Bus::new();
+
+        cpu.sp = 0xff;
+        cpu.stack_push(0x10, &mut bus);
+        let value = cpu.stack_pull(&bus);
+        assert_eq!(value, 0x10);
+        assert_eq!(cpu.sp, 0xff);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_stack_underflow() {
+        let mut cpu = Mos6502::new();
+        let mut bus = Bus::new();
+
+        cpu.sp = 0xff;
+        cpu.stack_pull(&bus);
     }
 }
