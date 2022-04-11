@@ -309,10 +309,32 @@ mod tests {
     fn test_pla() {
         let (mut cpu, mut bus) = init();        
         cpu.sp = 0xff;
+
         cpu.a = 0x10;
         common_execute(&mut cpu, &mut bus, 0x48); // push
         cpu.a = 0x11; 
         common_execute(&mut cpu, &mut bus, 0x68); // pull        
         assert_eq!(cpu.a, 0x10); // should override accumulator
+        assert_eq!(cpu.sp, 0xff);
+
+        // Test zero flag
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0x0;
+        common_execute(&mut cpu, &mut bus, 0x48);
+        cpu.a = 0x1; 
+        common_execute(&mut cpu, &mut bus, 0x68); 
+        assert_eq!(cpu.a, 0x0); 
+        assert_eq!(cpu.flags, 0b0000_0010);
+        assert_eq!(cpu.sp, 0xff);
+
+        // Test negative flag
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0xff;
+        common_execute(&mut cpu, &mut bus, 0x48);
+        cpu.a = 0x1; 
+        common_execute(&mut cpu, &mut bus, 0x68); 
+        assert_eq!(cpu.a, 0xff); 
+        assert_eq!(cpu.flags, 0b1000_0000);
+        assert_eq!(cpu.sp, 0xff);
     }
 }
