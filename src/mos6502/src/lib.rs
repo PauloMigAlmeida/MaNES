@@ -29,7 +29,7 @@ impl Mos6502 {
         }
     }
 
-    pub fn execute_instruction(&mut self, opcode: u8, bus: &Bus) -> u8 {
+    pub fn execute_instruction(&mut self, opcode: u8, bus: &mut Bus) -> u8 {
         let inst = parse_instruction(opcode);
         let r = (inst.function)(self, inst.mode, bus);
         self.pc += inst.bytes as u16;
