@@ -152,7 +152,7 @@ mod tests {
     #[should_panic]
     fn test_stack_underflow() {
         let mut cpu = Mos6502::new();
-        let mut bus = Bus::new();
+        let bus = Bus::new();
 
         cpu.sp = 0xff;
         cpu.stack_pull(&bus);
