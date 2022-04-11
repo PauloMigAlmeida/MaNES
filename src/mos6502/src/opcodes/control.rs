@@ -204,10 +204,18 @@ pub fn sed(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &Bus) -> u8 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::opcodes::OPTABLE;
+    use crate::opcodes::{OPTABLE};
 
     fn init() -> (Mos6502, Bus) {
         (Mos6502::new(), Bus::new())
+    }
+
+    fn common_execute(cpu: &mut Mos6502, bus: &Bus, opcode: usize) {
+        let opcode = OPTABLE[opcode];
+        let old_pc = cpu.pc;
+        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(old_pc + opcode.bytes as u16, cpu.pc);
     }
 
     #[test]
@@ -220,77 +228,56 @@ mod tests {
     #[test]
     fn test_cli() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0x58];
-
         cpu.flags = 0b1100_1111;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
-        assert_eq!(cpu.flags, 0b1100_1011);
-        assert_eq!(cycles, opcode.cycles);
+        common_execute(&mut cpu, &bus, 0x58);
+        assert_eq!(cpu.flags, 0b1100_1011);        
     }
 
     #[test]
     fn test_sei() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0x78];
-
         cpu.flags = 0b1100_1011;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
-        assert_eq!(cpu.flags, 0b1100_1111);
-        assert_eq!(cycles, opcode.cycles);
+        common_execute(&mut cpu, &bus, 0x78);
+        assert_eq!(cpu.flags, 0b1100_1111);        
     }
 
     #[test]
     fn test_clc() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0x18];
-
         cpu.flags = 0b1100_1111;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
+        common_execute(&mut cpu, &bus, 0x18);
         assert_eq!(cpu.flags, 0b1100_1110);
-        assert_eq!(cycles, opcode.cycles);
     }
 
     #[test]
     fn test_sec() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0x38];
-
         cpu.flags = 0b1100_1110;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
+        common_execute(&mut cpu, &bus, 0x38);
         assert_eq!(cpu.flags, 0b1100_1111);
-        assert_eq!(cycles, opcode.cycles);
     }
 
     #[test]
     fn test_clv() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0xb8];
-
         cpu.flags = 0b1100_1111;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
+        common_execute(&mut cpu, &bus, 0xb8);
         assert_eq!(cpu.flags, 0b1000_1111);
-        assert_eq!(cycles, opcode.cycles);
     }
 
     #[test]
     fn test_cld() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0xd8];
-
         cpu.flags = 0b1100_1111;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
+        common_execute(&mut cpu, &bus, 0xd8);
         assert_eq!(cpu.flags, 0b1100_0111);
-        assert_eq!(cycles, opcode.cycles);
     }
 
     #[test]
     fn test_sed() {
         let (mut cpu, bus) = init();        
-        let opcode = OPTABLE[0xf8];
-
         cpu.flags = 0b1100_0111;
-        let cycles = cpu.execute_instruction(opcode.opcode, &bus);
+        common_execute(&mut cpu, &bus, 0xf8);
         assert_eq!(cpu.flags, 0b1100_1111);
-        assert_eq!(cycles, opcode.cycles);
     }
 }

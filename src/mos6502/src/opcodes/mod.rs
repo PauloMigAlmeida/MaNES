@@ -19,7 +19,7 @@ pub struct Instruction<'a> {
     name: &'a str,
     pub cycles: u8,
     pub mode: AddressingMode,
-    bytes: u8,
+    pub bytes: u8,
     pub function: OpcodeFunction,
 }
 
