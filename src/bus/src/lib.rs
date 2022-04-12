@@ -3,13 +3,15 @@
 ///         ranges so we can iterate through the list to find out which of them read/write op is
 ///         meant to be carried out
 
+const RAM_SIZE:u16 = 0xFFFF;
+
 pub struct Bus {
-    ram: [u8; 0x10000]
+    ram: [u8; RAM_SIZE as usize + 1]
 }
 
 impl Bus {
     pub fn new() -> Self {
-        Bus{ ram: [0; 0x10000] }
+        Bus{ ram: [0; RAM_SIZE as usize + 1] }
     }
 
     pub fn read_address(&self, addr: u16) -> u8 {
