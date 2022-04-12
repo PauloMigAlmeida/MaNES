@@ -14,8 +14,11 @@ pub fn brk(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     0
 }
 
+/// PHP - Push Processor Status
+/// Pushes a copy of the status flags on to the stack.
 pub fn php(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     println!("php was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.stack_push(cpu.flags, bus);
     0
 }
 
@@ -98,8 +101,18 @@ pub fn pha(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     0
 }
 
+/// RTI - Return from Interrupt
+/// The RTI instruction is used at the end of an interrupt processing routine. It pulls the processor flags from the stack followed by the program counter.
 pub fn rti(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     println!("rti was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    cpu.flags = cpu.stack_pull(bus);
+
+    //TODO verify if that's the order in which I put PC value back (you know, endian vs little-endian still drives me nuts)
+    let mut value = cpu.stack_pull(bus) as u16;
+    value <<= 8;
+    value |= cpu.stack_pull(bus) as u16;
+    cpu.pc = value;
+
     0
 }
 
@@ -118,6 +131,8 @@ pub fn bit(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
 
 pub fn plp(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     println!("plp was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    let value = cpu.stack_pull(bus);
+    cpu.flags = value;
     0
 }
 
@@ -335,6 +350,29 @@ mod tests {
         common_execute(&mut cpu, &mut bus, 0x68); 
         assert_eq!(cpu.a, 0xff); 
         assert_eq!(cpu.flags, 0b1000_0000);
+        assert_eq!(cpu.sp, 0xff);
+    }
+
+    #[test]
+    fn test_php() {
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b1100_1110;
+        common_execute(&mut cpu, &mut bus, 0x08);
+        assert_eq!(cpu.flags, 0b1100_1110);
+        assert_eq!(bus.read_address(0x01ff), 0b1100_1110);
+    }
+
+    #[test]
+    fn test_plp() {
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+
+        cpu.flags = 0b1100_1110;
+        common_execute(&mut cpu, &mut bus, 0x08); // php
+        cpu.flags = 0;
+        common_execute(&mut cpu, &mut bus, 0x28); //plp
+        assert_eq!(cpu.flags, 0b1100_1110);
         assert_eq!(cpu.sp, 0xff);
     }
 }

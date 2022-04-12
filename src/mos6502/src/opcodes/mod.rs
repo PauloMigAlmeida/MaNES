@@ -15,8 +15,8 @@ type OpcodeFunction = fn(&mut Mos6502, AddressingMode, &mut Bus) -> u8;
 
 #[derive(Copy, Clone)]
 pub struct Instruction<'a> {
-    opcode: u8,
-    name: &'a str,
+    pub opcode: u8,
+    pub name: &'a str,
     pub cycles: u8,
     pub mode: AddressingMode,
     pub bytes: u8,
