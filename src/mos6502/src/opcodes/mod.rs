@@ -120,7 +120,7 @@ pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x3e, name: "ROL", mode: AbsoluteX,   bytes: 3, cycles: 7, function: rol },
     Instruction { opcode: 0x3f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
 
-    Instruction { opcode: 0x40, name: "rti", mode: Implicit,    bytes: 1, cycles: 6, function: rti },
+    Instruction { opcode: 0x40, name: "RTI", mode: Implicit,    bytes: 1, cycles: 6, function: rti },
     Instruction { opcode: 0x41, name: "ERO", mode: IndirectX,   bytes: 2, cycles: 6, function: eor },
     Instruction { opcode: 0x42, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0x43, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },

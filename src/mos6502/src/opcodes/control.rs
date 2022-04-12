@@ -107,7 +107,9 @@ pub fn rti(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     println!("rti was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
     cpu.flags = cpu.stack_pull(bus);
 
-    //TODO verify if that's the order in which I put PC value back (you know, endian vs little-endian still drives me nuts)
+    // TODO verify if that's the order in which I put PC value back (you know, endian vs little-endian still drives me nuts)
+    // Also, I'm not 100% convinced that I should just to replace cpu.pc with the value out of the stack as the pc value gets 
+    // incremented with the instruction size (in this case 1)... 
     let mut value = cpu.stack_pull(bus) as u16;
     value <<= 8;
     value |= cpu.stack_pull(bus) as u16;
@@ -373,6 +375,29 @@ mod tests {
         cpu.flags = 0;
         common_execute(&mut cpu, &mut bus, 0x28); //plp
         assert_eq!(cpu.flags, 0b1100_1110);
+        assert_eq!(cpu.sp, 0xff);
+    }
+
+    #[test]
+    fn test_rti() {
+        let (mut cpu, mut bus) = init();
+        
+        cpu.sp = 0xff;        
+        cpu.flags = 0b1100_1110;
+        cpu.pc = 0x0203;
+
+        cpu.stack_push((cpu.pc & 0xff) as u8, &mut bus); // LSB
+        cpu.stack_push(((cpu.pc & 0xff00) >> 8) as u8, &mut bus); //MSB
+        cpu.stack_push(cpu.flags, &mut bus);
+        
+        cpu.flags = 0;
+        cpu.pc = 0;
+
+        let opcode = OPTABLE[0x40];        
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);        
+        assert_eq!(cpu.flags, 0b1100_1110);
+        assert_eq!(cpu.pc, 0x0203);
         assert_eq!(cpu.sp, 0xff);
     }
 }

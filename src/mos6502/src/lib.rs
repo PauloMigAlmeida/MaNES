@@ -32,9 +32,13 @@ impl Mos6502 {
     pub fn execute_instruction(&mut self, opcode: u8, bus: &mut Bus) -> u8 {
         let inst = parse_instruction(opcode);
         let r = (inst.function)(self, inst.mode, bus);
+        
+        // TODO validate if instructions like RTI should have the following like executed        
         if inst.name != "RTI" {
+            println!("chamei RTI: {}", inst.name);
             self.pc += inst.bytes as u16;
         }
+        
         inst.cycles as u8 + r
     }
 
