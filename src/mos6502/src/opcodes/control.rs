@@ -1,6 +1,6 @@
 use bus::Bus;
 use super::Flags::*;
-use super::{Mos6502, AddressingMode};
+use super::{Mos6502, AddressingMode, Instruction};
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -9,74 +9,78 @@ use super::{Mos6502, AddressingMode};
 /// The program counter and processor status are pushed on the stack then the 
 /// IRQ interrupt vector at $FFFE/F is loaded into the PC and the break flag 
 /// in the status set to one.
-pub fn brk(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("brk was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn brk(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// PHP - Push Processor Status
 /// Pushes a copy of the status flags on to the stack.
-pub fn php(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("php was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn php(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.stack_push(cpu.flags, bus);
+    cpu.pc += 1;
     0
 }
 
-pub fn bpl(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bpl was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bpl(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// CLC - Clear Carry Flag
 /// Set the carry flag to zero.
-pub fn clc(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("clc was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn clc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.clear_flag(Carry);
+    cpu.pc += 1;
     0
 }
 
-pub fn jmp(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("jmp was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn jmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// CLI - Clear Interrupt Disable
 /// Clears the interrupt disable flag allowing normal interrupt
 /// requests to be serviced.
-pub fn cli(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("cli was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn cli(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.clear_flag(Interrupt);
+    cpu.pc += 1;
     0
 }
 
 /// SEI - Set Interrupt Disable
 /// Set the interrupt disable flag to one.
-pub fn sei(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("sei was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn sei(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.set_flag(Interrupt);
+    cpu.pc += 1;
     0
 }
 
-pub fn bvs(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bvs was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bvs(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn jsr(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("jsr was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn jsr(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bvc(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bvc was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bvc(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// RTS - Return from Subroutine
 /// The RTS instruction is used at the end of a subroutine to return to the calling routine. 
 /// It pulls the program counter (minus one) from the stack.
-pub fn rts(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("rts was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn rts(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     
     //TODO check if I really need to decrement pc here... my initial mental model says that I don't while the docs says
     // that I do... I guess I will learn when things break magestically :)    
@@ -91,8 +95,8 @@ pub fn rts(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
 /// PLA - Pull Accumulator
 /// Pulls an 8 bit value from the stack and into the accumulator. 
 /// The zero and negative flags are set as appropriate.
-pub fn pla(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("pla was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn pla(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     let value = cpu.stack_pull(bus);
     if value == 0 {
         cpu.set_flag(Zero);
@@ -101,21 +105,23 @@ pub fn pla(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
         cpu.set_flag(Negative);
     }
     cpu.a = value;
+    cpu.pc += 1;
     0
 }
 
 /// PHA - Push Accumulator
 /// Pushes a copy of the accumulator on to the stack.
-pub fn pha(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("pha was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn pha(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.stack_push(cpu.a, bus);
+    cpu.pc += 1;
     0
 }
 
 /// RTI - Return from Interrupt
 /// The RTI instruction is used at the end of an interrupt processing routine. It pulls the processor flags from the stack followed by the program counter.
-pub fn rti(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("rti was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn rti(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.flags = cpu.stack_pull(bus);
 
     // TODO verify if that's the order in which I put PC value back (you know, endian vs little-endian still drives me nuts)
@@ -131,115 +137,120 @@ pub fn rti(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
 
 /// SEC - Set Carry Flag
 /// Set the carry flag to one.
-pub fn sec(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("sec was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn sec(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.set_flag(Carry);
+    cpu.pc += 1;
     0
 }
 
-pub fn bit(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bit was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bit(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn plp(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("plp was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn plp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     let value = cpu.stack_pull(bus);
     cpu.flags = value;
+    cpu.pc += 1;
     0
 }
 
-pub fn bmi(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bmi was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bmi(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn sty(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("sty was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn sty(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn dey(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("dey was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn dey(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bcc(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bcc was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bcc(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn tya(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("tya was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn tya(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn ldy(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("ldy was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn ldy(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn tay(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("tay was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn tay(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bcs(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bcs was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bcs(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// CLV - Clear Overflow Flag
 /// Clears the overflow flag.
-pub fn clv(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("clv was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn clv(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.clear_flag(Overflow);
+    cpu.pc += 1;
     0
 }
 
-pub fn cpy(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("cpy was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn cpy(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn iny(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("iny was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn iny(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bne(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("bne was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn bne(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// CLD - Clear Decimal Mode
 /// Sets the decimal mode flag to zero.
-pub fn cld(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("cld was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn cld(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.clear_flag(Decimal);
+    cpu.pc += 1;
     0
 }
 
-pub fn cpx(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("cpx was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn cpx(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn inx(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("inx was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn inx(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn beq(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
-    println!("beq was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn beq(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
 /// SED - Set Decimal Flag
 /// Set the decimal mode flag to one.
-pub fn sed(cpu: &mut Mos6502, addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
-    println!("sed was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+pub fn sed(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.set_flag(Decimal);
+    cpu.pc += 1;
     0
 }
 

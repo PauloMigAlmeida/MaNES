@@ -1,10 +1,11 @@
 use bus::Bus;
-use super::{Mos6502, AddressingMode};
+use super::{Mos6502, AddressingMode, Instruction};
 
 /// IVL - Invalid Opcode
-/// It's not my intention to implement unofficial opcodes at this moment
+/// It's not my intention to implement unofficial opcodes at the moment
 /// so I will simply panic the execution should I ever see one
-pub fn invalid(_cpu: &mut Mos6502, _addr_mode: AddressingMode, _bus: &mut Bus) -> u8 {
+pub fn invalid(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     panic!("Invalid opcode found... aborting");
 }
 

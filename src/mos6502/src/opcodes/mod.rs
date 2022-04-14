@@ -11,7 +11,7 @@ use rmw::*;
 use unofficial::*;
 use AddressingMode::*;
 
-type OpcodeFunction = fn(&mut Mos6502, AddressingMode, &mut Bus) -> u8;
+type OpcodeFunction = fn(&mut Mos6502, Instruction, &mut Bus) -> u8;
 
 #[derive(Copy, Clone)]
 pub struct Instruction<'a> {
