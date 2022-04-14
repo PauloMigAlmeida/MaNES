@@ -72,8 +72,19 @@ pub fn bvc(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     0
 }
 
+/// RTS - Return from Subroutine
+/// The RTS instruction is used at the end of a subroutine to return to the calling routine. 
+/// It pulls the program counter (minus one) from the stack.
 pub fn rts(cpu: &mut Mos6502, addr_mode: AddressingMode, bus: &mut Bus) -> u8 {
     println!("rts was called with cpu: {:?} and addr_mode: {:?}", cpu, addr_mode);
+    
+    //TODO check if I really need to decrement pc here... my initial mental model says that I don't while the docs says
+    // that I do... I guess I will learn when things break magestically :)    
+    let mut value = cpu.stack_pull(bus) as u16;
+    value <<= 8;
+    value |= cpu.stack_pull(bus) as u16;
+    cpu.pc = value;
+
     0
 }
 
@@ -397,6 +408,27 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);        
         assert_eq!(cpu.flags, 0b1100_1110);
+        assert_eq!(cpu.pc, 0x0203);
+        assert_eq!(cpu.sp, 0xff);
+    }
+
+    #[test]
+    fn test_rts() {
+        let (mut cpu, mut bus) = init();
+        
+        cpu.sp = 0xff;        
+        cpu.flags = 1;
+        cpu.pc = 0x0203;
+
+        cpu.stack_push((cpu.pc & 0xff) as u8, &mut bus); // LSB
+        cpu.stack_push(((cpu.pc & 0xff00) >> 8) as u8, &mut bus); //MSB
+        
+        cpu.pc = 0;
+
+        let opcode = OPTABLE[0x60];        
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);        
+        assert_eq!(cpu.flags, 1);
         assert_eq!(cpu.pc, 0x0203);
         assert_eq!(cpu.sp, 0xff);
     }

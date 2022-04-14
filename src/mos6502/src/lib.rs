@@ -33,9 +33,8 @@ impl Mos6502 {
         let inst = parse_instruction(opcode);
         let r = (inst.function)(self, inst.mode, bus);
         
-        // TODO validate if instructions like RTI should have the following like executed        
-        if inst.name != "RTI" {
-            println!("chamei RTI: {}", inst.name);
+        // TODO validate if instructions like RTI/RTS should have the following like executed        
+        if inst.name != "RTI" && inst.name != "RTS" {
             self.pc += inst.bytes as u16;
         }
         
