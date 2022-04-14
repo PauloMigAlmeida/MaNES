@@ -23,7 +23,13 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
             let addr = bus.read_address(cpu.pc + 1);
             bus.read_address(addr as u16)
         },
-        _ => panic!("not implemented yet"),
+        ZeroPageX => {
+            // val = PEEK((arg + X) % 256)
+            let mut addr = bus.read_address(cpu.pc + 1) as u16;
+            addr = (addr + cpu.x as u16) % 256;
+            bus.read_address(addr)
+        }
+        _ => panic!("not supported"),
     };
 
     cpu.a = cpu.a & fetched;
@@ -76,11 +82,10 @@ mod test{
 
     #[test]
     fn test_and() {
-        let (mut cpu, mut bus) = init();
-        let opcode = OPTABLE[0x29];
-        cpu.sp = 0xff;
-
         // Immediate mode, no flags set
+        let opcode = OPTABLE[0x29];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
         cpu.a = 0b0000_1100;
         cpu.pc = 0x10;
@@ -93,6 +98,8 @@ mod test{
         assert_eq!(cpu.sp, 0xff);
 
         // Immediate mode, zero flag set
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x10;
@@ -105,6 +112,8 @@ mod test{
         assert_eq!(cpu.sp, 0xff);
 
         // Immediate mode, negative flag set
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x10;
@@ -118,6 +127,8 @@ mod test{
 
         // ZeroPage mode, no flags
         let opcode = OPTABLE[0x25];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x0800;
@@ -126,6 +137,39 @@ mod test{
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0000_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0802);
+        assert_eq!(cpu.sp, 0xff);
+
+        // ZeroPage X mode, no flags
+        let opcode = OPTABLE[0x35];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.x = 0x01;
+        cpu.pc = 0x0800;
+        bus.write_address(cpu.pc + 1, 0x10);
+        bus.write_address(0x11, 0b0000_1111); // write to zero page
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0000_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0802);
+        assert_eq!(cpu.sp, 0xff);
+
+        // ZeroPage X mode (with hardware page wrap around 'bug'), no flags
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.x = 0xFF;
+        cpu.pc = 0x0800;
+        bus.write_address(cpu.pc + 1, 0x10);
+        bus.write_address(0xF, 0b0001_1111); // write to zero page
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0001_1111);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
