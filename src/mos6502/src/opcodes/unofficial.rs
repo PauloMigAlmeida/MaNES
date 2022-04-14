@@ -1,5 +1,5 @@
 use bus::Bus;
-use super::{Mos6502, AddressingMode, Instruction};
+use super::{Mos6502, Instruction};
 
 /// IVL - Invalid Opcode
 /// It's not my intention to implement unofficial opcodes at the moment

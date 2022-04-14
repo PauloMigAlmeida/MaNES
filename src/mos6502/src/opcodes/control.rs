@@ -1,6 +1,6 @@
 use bus::Bus;
 use super::Flags::*;
-use super::{Mos6502, AddressingMode, Instruction};
+use super::{Mos6502, Instruction};
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -9,7 +9,7 @@ use super::{Mos6502, AddressingMode, Instruction};
 /// The program counter and processor status are pushed on the stack then the 
 /// IRQ interrupt vector at $FFFE/F is loaded into the PC and the break flag 
 /// in the status set to one.
-pub fn brk(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn brk(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -23,7 +23,7 @@ pub fn php(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn bpl(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bpl(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -37,7 +37,7 @@ pub fn clc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn jmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn jmp(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -61,17 +61,17 @@ pub fn sei(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn bvs(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bvs(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn jsr(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn jsr(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bvc(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bvc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -144,7 +144,7 @@ pub fn sec(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn bit(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bit(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -157,42 +157,42 @@ pub fn plp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn bmi(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bmi(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn sty(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn sty(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn dey(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn dey(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bcc(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bcc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn tya(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn tya(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn ldy(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn ldy(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn tay(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn tay(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bcs(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bcs(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -206,17 +206,17 @@ pub fn clv(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn cpy(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn cpy(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn iny(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn iny(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn bne(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn bne(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
@@ -230,17 +230,17 @@ pub fn cld(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn cpx(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn cpx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn inx(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn inx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
-pub fn beq(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+pub fn beq(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }

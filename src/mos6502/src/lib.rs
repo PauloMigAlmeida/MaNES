@@ -1,7 +1,7 @@
 mod opcodes;
 
 use bus::Bus;
-use opcodes::{Instruction, AddressingMode, parse_instruction, Flags};
+use opcodes::{parse_instruction, Flags};
 
 const STACK_PAGE:u16 = 0x0100;
 
