@@ -19,6 +19,10 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
 
     let fetched= match inst.mode {
         Immediate => bus.read_address(cpu.pc + 1),
+        ZeroPage => {
+            let addr = bus.read_address(cpu.pc + 1);
+            bus.read_address(addr as u16)
+        },
         _ => panic!("not implemented yet"),
     };
 
@@ -92,12 +96,38 @@ mod test{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x10;
+        bus.write_address(cpu.pc + 1, 0b0000_0000);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0000_0000);
+        assert_eq!(cpu.flags, 0b0000_0010);
+        assert_eq!(cpu.pc, 0x12);
+        assert_eq!(cpu.sp, 0xff);
+
+        // Immediate mode, negative flag set
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.pc = 0x10;
         bus.write_address(cpu.pc + 1, 0b1000_0000);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b1000_0000);
         assert_eq!(cpu.flags, 0b1000_0000);
         assert_eq!(cpu.pc, 0x12);
+        assert_eq!(cpu.sp, 0xff);
+
+        // ZeroPage mode, no flags
+        let opcode = OPTABLE[0x25];
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.pc = 0x0800;
+        bus.write_address(cpu.pc + 1, 0x10);
+        bus.write_address(0x0010, 0b0000_1111); // write to zero page
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0000_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
     }
 }
