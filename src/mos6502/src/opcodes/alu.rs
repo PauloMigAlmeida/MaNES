@@ -44,6 +44,17 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
             }
 
             bus.read_u8(addr)
+        },
+        AbsoluteY => {
+            let orig_addr = bus.read_u16(cpu.pc + 1);
+            let addr = orig_addr + cpu.y as u16;
+
+            // page crossing costs 1 additional cycle
+            if (orig_addr >> 8) != (addr >> 8) {
+                additional_cycle = 1;
+            }
+
+            bus.read_u8(addr)
         }
         _ => panic!("invalid addressing mode... aborting"),
     };
@@ -230,6 +241,40 @@ mod test{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.x = 0xFF;
+        cpu.pc = 0x0800;
+        bus.write_u16(cpu.pc + 1, 0x1234);
+        bus.write_u8(0x1333, 0b0001_1111);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles + 1);
+        assert_eq!(cpu.a, 0b0001_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0803);
+        assert_eq!(cpu.sp, 0xff);
+
+        // Absolute Y mode, no flags
+        let opcode = OPTABLE[0x39];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.y = 0x10;
+        cpu.pc = 0x0800;
+        bus.write_u16(cpu.pc + 1, 0x1234);
+        bus.write_u8(0x1244, 0b0001_1111);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0001_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0803);
+        assert_eq!(cpu.sp, 0xff);
+
+        // Absolute Y mode, no flags, page crossed
+        let opcode = OPTABLE[0x39];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.y = 0xFF;
         cpu.pc = 0x0800;
         bus.write_u16(cpu.pc + 1, 0x1234);
         bus.write_u8(0x1333, 0b0001_1111);
