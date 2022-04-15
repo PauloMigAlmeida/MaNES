@@ -55,6 +55,13 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
             }
 
             bus.read_u8(addr)
+        },
+        IndirectX => {
+            // val = PEEK(PEEK((arg + X) % 256) + PEEK((arg + X + 1) % 256) * 256)
+            let arg = bus.read_u8(cpu.pc + 1) as u16;
+            let low = bus.read_u8((arg + cpu.x as u16) & 0xff) as u16;
+            let high = bus.read_u8((arg + cpu.x as u16 + 1) & 0xff) as u16;
+            bus.read_u8((high << 8) | low)
         }
         _ => panic!("invalid addressing mode... aborting"),
     };

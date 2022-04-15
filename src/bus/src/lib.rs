@@ -21,9 +21,9 @@ impl Bus {
     }
 
     pub fn read_u16(&self, addr: u16) -> u16 {
-        let low = self.ram[addr as usize] as u16;
-        let high = self.ram[(addr + 1) as usize] as u16;
-        (high << 8) | low
+        let low = self.read_u8(addr);
+        let high = self.read_u8(addr + 1);
+        ((high as u16) << 8) | low as u16
     }
 
     pub fn write_u8(&mut self, addr: u16, value: u8) {
