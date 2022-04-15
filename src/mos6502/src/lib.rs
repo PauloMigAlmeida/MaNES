@@ -52,7 +52,7 @@ impl Mos6502 {
         }
 
         let addr: u16 = STACK_PAGE | self.sp as u16;
-        bus.write_address(addr, value);
+        bus.write_u8(addr, value);
         self.sp -= 1;
     }
 
@@ -63,7 +63,7 @@ impl Mos6502 {
 
         self.sp += 1;
         let addr: u16 = STACK_PAGE | self.sp  as u16;
-        let value = bus.read_address(addr);
+        let value = bus.read_u8(addr);
         value
     }
 }
@@ -120,8 +120,8 @@ mod tests {
         assert_eq!(cpu.sp, 0xfe);
         cpu.stack_push(0x11, &mut bus);
         assert_eq!(cpu.sp, 0xfd);
-        assert_eq!(bus.read_address(STACK_PAGE | 0xff), 0x10);
-        assert_eq!(bus.read_address(STACK_PAGE | 0xfe), 0x11);
+        assert_eq!(bus.read_u8(STACK_PAGE | 0xff), 0x10);
+        assert_eq!(bus.read_u8(STACK_PAGE | 0xfe), 0x11);
     }
 
     #[test]

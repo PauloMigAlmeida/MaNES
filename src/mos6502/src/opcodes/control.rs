@@ -341,7 +341,7 @@ mod tests {
         cpu.a = 0x10;
         common_execute(&mut cpu, &mut bus, 0x48);
         assert_eq!(cpu.a, 0x10);
-        assert_eq!(bus.read_address(0x01ff), 0x10);
+        assert_eq!(bus.read_u8(0x01ff), 0x10);
     }
 
     #[test]
@@ -384,7 +384,7 @@ mod tests {
         cpu.flags = 0b1100_1110;
         common_execute(&mut cpu, &mut bus, 0x08);
         assert_eq!(cpu.flags, 0b1100_1110);
-        assert_eq!(bus.read_address(0x01ff), 0b1100_1110);
+        assert_eq!(bus.read_u8(0x01ff), 0b1100_1110);
     }
 
     #[test]
