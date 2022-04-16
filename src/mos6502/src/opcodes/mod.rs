@@ -87,7 +87,7 @@ pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x1f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
 
     Instruction { opcode: 0x20, name: "JSR", mode: Relative,    bytes: 2, cycles: 2, function: jsr },
-    Instruction { opcode: 0x21, name: "AND", mode: IndirectY,   bytes: 2, cycles: 6, function: and },
+    Instruction { opcode: 0x21, name: "AND", mode: IndirectX,   bytes: 2, cycles: 6, function: and },
     Instruction { opcode: 0x22, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0x23, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0x24, name: "BIT", mode: ZeroPage,    bytes: 2, cycles: 3, function: bit },

@@ -291,5 +291,23 @@ mod test{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
+
+        // Indirect X mode, no flags
+        let opcode = OPTABLE[0x21];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.a = 0b1111_1111;
+        cpu.pc = 0x0800;
+        bus.write_u8(cpu.pc + 1, 0x34);
+        bus.write_u8(0x34, 0x34);
+        bus.write_u8(0x35, 0x12);
+        bus.write_u8(0x1234, 0b0001_1111);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0001_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0802);
+        assert_eq!(cpu.sp, 0xff);
     }
 }
