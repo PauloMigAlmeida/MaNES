@@ -2,6 +2,7 @@ mod opcodes;
 
 use bus::Bus;
 use opcodes::{parse_instruction, Flags};
+use crate::opcodes::{AddressingMode::*, Instruction};
 
 const STACK_PAGE:u16 = 0x0100;
 
@@ -66,6 +67,76 @@ impl Mos6502 {
         let value = bus.read_u8(addr);
         value
     }
+
+    pub fn address_mode_fetch(&self, bus: &Bus, inst: &Instruction) -> (u8, u8) {
+        let mut additional_cycle= 0;
+
+        let fetched= match inst.mode {
+            Immediate => bus.read_u8(self.pc + 1),
+            ZeroPage => {
+                let addr = bus.read_u8(self.pc + 1);
+                bus.read_u8(addr as u16)
+            },
+            ZeroPageX => {
+                // val = PEEK((arg + X) % 256) to simulate hardware bug in 6502
+                let mut addr = bus.read_u8(self.pc + 1) as u16;
+                addr = (addr + self.x as u16) % 256;
+                bus.read_u8(addr)
+            },
+            Absolute => {
+                let addr = bus.read_u16(self.pc + 1);
+                bus.read_u8(addr)
+            },
+            AbsoluteX => {
+                let orig_addr = bus.read_u16(self.pc + 1);
+                let addr = orig_addr + self.x as u16;
+
+                // page crossing costs 1 additional cycle.. Joao would be proud of me now <3
+                if (orig_addr >> 8) != (addr >> 8) {
+                    additional_cycle = 1;
+                }
+
+                bus.read_u8(addr)
+            },
+            AbsoluteY => {
+                let orig_addr = bus.read_u16(self.pc + 1);
+                let addr = orig_addr + self.y as u16;
+
+                // page crossing costs 1 additional cycle
+                if (orig_addr >> 8) != (addr >> 8) {
+                    additional_cycle = 1;
+                }
+
+                bus.read_u8(addr)
+            },
+            IndirectX => {
+                // val = PEEK(PEEK((arg + X) % 256) + PEEK((arg + X + 1) % 256) * 256)
+                let arg = bus.read_u8(self.pc + 1) as u16;
+                let low = bus.read_u8((arg + self.x as u16) & 0xff) as u16;
+                let high = bus.read_u8((arg + self.x as u16 + 1) & 0xff) as u16;
+                bus.read_u8((high << 8) | low)
+            },
+            IndirectY => {
+                // val = PEEK(PEEK(arg) + PEEK((arg + 1) % 256) * 256 + Y)
+                let arg = bus.read_u8(self.pc + 1) as u16;
+                let low = bus.read_u8(arg  & 0xff) as u16;
+                let high = bus.read_u8((arg + 1) & 0xff) as u16;
+
+                let orig_addr = (high << 8) | low;
+                let addr = orig_addr + self.y as u16;
+
+                // page crossing costs 1 additional cycle
+                if (orig_addr >> 8) != (addr >> 8) {
+                    additional_cycle = 1;
+                }
+
+                bus.read_u8(addr)
+            }
+            _ => panic!("invalid addressing mode... aborting"),
+        };
+        (fetched, additional_cycle)
+    }
+
 }
 
 #[cfg(test)]

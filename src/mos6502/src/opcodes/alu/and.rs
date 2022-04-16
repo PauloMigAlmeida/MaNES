@@ -1,86 +1,12 @@
 use bus::Bus;
 use crate::Flags::{Negative, Zero};
-use super::{Mos6502, AddressingMode::*, Instruction};
-
-//TODO implement actual functions here... right now I'm just interested in the scaffold
-
-pub fn ora(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn adc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
+use super::Mos6502;
+use super::Instruction;
 
 pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    let mut additional_cycle = 0_u8;
 
-    let fetched= match inst.mode {
-        Immediate => bus.read_u8(cpu.pc + 1),
-        ZeroPage => {
-            let addr = bus.read_u8(cpu.pc + 1);
-            bus.read_u8(addr as u16)
-        },
-        ZeroPageX => {
-            // val = PEEK((arg + X) % 256) to simulate hardware bug in 6502
-            let mut addr = bus.read_u8(cpu.pc + 1) as u16;
-            addr = (addr + cpu.x as u16) % 256;
-            bus.read_u8(addr)
-        },
-        Absolute => {
-            let addr = bus.read_u16(cpu.pc + 1);
-            bus.read_u8(addr)
-        },
-        AbsoluteX => {
-            let orig_addr = bus.read_u16(cpu.pc + 1);
-            let addr = orig_addr + cpu.x as u16;
-
-            // page crossing costs 1 additional cycle.. Joao would be proud of me now <3
-            if (orig_addr >> 8) != (addr >> 8) {
-                additional_cycle = 1;
-            }
-
-            bus.read_u8(addr)
-        },
-        AbsoluteY => {
-            let orig_addr = bus.read_u16(cpu.pc + 1);
-            let addr = orig_addr + cpu.y as u16;
-
-            // page crossing costs 1 additional cycle
-            if (orig_addr >> 8) != (addr >> 8) {
-                additional_cycle = 1;
-            }
-
-            bus.read_u8(addr)
-        },
-        IndirectX => {
-            // val = PEEK(PEEK((arg + X) % 256) + PEEK((arg + X + 1) % 256) * 256)
-            let arg = bus.read_u8(cpu.pc + 1) as u16;
-            let low = bus.read_u8((arg + cpu.x as u16) & 0xff) as u16;
-            let high = bus.read_u8((arg + cpu.x as u16 + 1) & 0xff) as u16;
-            bus.read_u8((high << 8) | low)
-        },
-        IndirectY => {
-            // val = PEEK(PEEK(arg) + PEEK((arg + 1) % 256) * 256 + Y)
-            let arg = bus.read_u8(cpu.pc + 1) as u16;
-            let low = bus.read_u8(arg  & 0xff) as u16;
-            let high = bus.read_u8((arg + 1) & 0xff) as u16;
-
-            let orig_addr = (high << 8) | low;
-            let addr = orig_addr + cpu.y as u16;
-
-            // page crossing costs 1 additional cycle
-            if (orig_addr >> 8) != (addr >> 8) {
-                additional_cycle = 1;
-            }
-
-            bus.read_u8(addr)
-        }
-        _ => panic!("invalid addressing mode... aborting"),
-    };
+    let (fetched, additional_cycle) = cpu.address_mode_fetch(bus, &inst);
 
     cpu.a = cpu.a & fetched;
 
@@ -93,31 +19,6 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     }
     cpu.pc += inst.bytes as u16;
     additional_cycle
-}
-
-pub fn eor(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn sta(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn lda(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn cmp(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn sbc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
 }
 
 #[cfg(test)]
