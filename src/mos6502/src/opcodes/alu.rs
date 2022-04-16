@@ -62,6 +62,22 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
             let low = bus.read_u8((arg + cpu.x as u16) & 0xff) as u16;
             let high = bus.read_u8((arg + cpu.x as u16 + 1) & 0xff) as u16;
             bus.read_u8((high << 8) | low)
+        },
+        IndirectY => {
+            // val = PEEK(PEEK(arg) + PEEK((arg + 1) % 256) * 256 + Y)
+            let arg = bus.read_u8(cpu.pc + 1) as u16;
+            let low = bus.read_u8(arg  & 0xff) as u16;
+            let high = bus.read_u8((arg + 1) & 0xff) as u16;
+
+            let orig_addr = (high << 8) | low;
+            let addr = orig_addr + cpu.y as u16;
+
+            // page crossing costs 1 additional cycle
+            if (orig_addr >> 8) != (addr >> 8) {
+                additional_cycle = 1;
+            }
+
+            bus.read_u8(addr)
         }
         _ => panic!("invalid addressing mode... aborting"),
     };
@@ -305,6 +321,45 @@ mod test{
         bus.write_u8(0x1234, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0001_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0802);
+        assert_eq!(cpu.sp, 0xff);
+
+        // Indirect Y mode, no flags
+        let opcode = OPTABLE[0x31];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.y = 0x1;
+        cpu.a = 0b1111_1111;
+        cpu.pc = 0x0800;
+        bus.write_u8(cpu.pc + 1, 0x34);
+        bus.write_u8(0x34, 0x34);
+        bus.write_u8(0x35, 0x12);
+        bus.write_u8(0x1234 + cpu.y as u16, 0b0001_1111);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0001_1111);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x0802);
+        assert_eq!(cpu.sp, 0xff);
+
+
+        // Indirect Y mode, no flags, page crossed
+        let opcode = OPTABLE[0x31];
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0000;
+        cpu.y = 0xff;
+        cpu.a = 0b1111_1111;
+        cpu.pc = 0x0800;
+        bus.write_u8(cpu.pc + 1, 0x34);
+        bus.write_u8(0x34, 0x34);
+        bus.write_u8(0x35, 0x12);
+        bus.write_u8(0x1234 + cpu.y as u16, 0b0001_1111);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles + 1);
         assert_eq!(cpu.a, 0b0001_1111);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
