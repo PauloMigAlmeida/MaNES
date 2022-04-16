@@ -68,6 +68,8 @@ impl Mos6502 {
         value
     }
 
+    // Notes to myself
+    // -> TODO: I'm not yet 100% confident that I got the inner workings of Indirect X && Y
     pub fn address_mode_fetch(&self, bus: &Bus, inst: &Instruction) -> (u8, u8) {
         let mut additional_cycle= 0;
 

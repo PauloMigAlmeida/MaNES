@@ -23,7 +23,7 @@ pub struct Instruction<'a> {
     pub function: OpcodeFunction,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum AddressingMode {
     Implicit,
     Accumulator,
