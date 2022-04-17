@@ -6,8 +6,9 @@ mod clv;
 mod cld;
 mod sed;
 mod sty;
+mod pha;
+mod pla;
 use bus::Bus;
-use super::Flags::*;
 use super::{Mos6502, Instruction};
 pub use cli::*;
 pub use sei::*;
@@ -17,6 +18,8 @@ pub use clv::*;
 pub use cld::*;
 pub use sed::*;
 pub use sty::*;
+pub use pha::*;
+pub use pla::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -77,32 +80,6 @@ pub fn rts(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     value |= cpu.stack_pull(bus) as u16;
     cpu.pc = value;
 
-    0
-}
-
-/// PLA - Pull Accumulator
-/// Pulls an 8 bit value from the stack and into the accumulator. 
-/// The zero and negative flags are set as appropriate.
-pub fn pla(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    let value = cpu.stack_pull(bus);
-    if value == 0 {
-        cpu.set_flag(Zero);
-    }
-    if (value & (1 << 7)) != 0 {
-        cpu.set_flag(Negative);
-    }
-    cpu.a = value;
-    cpu.pc += 1;
-    0
-}
-
-/// PHA - Push Accumulator
-/// Pushes a copy of the accumulator on to the stack.
-pub fn pha(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.stack_push(cpu.a, bus);
-    cpu.pc += 1;
     0
 }
 
@@ -216,56 +193,6 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(old_pc + opcode.bytes as u16, cpu.pc);
-    }
-
-    #[test]
-    fn test_brk() {
-        let (mut cpu, mut bus) = init();
-        cpu.execute_instruction(0x00, &mut bus);
-        assert_eq!(cpu.a, 0x00);
-    }
-
-    #[test]
-    fn test_pha() {
-        let (mut cpu, mut bus) = init();        
-        cpu.sp = 0xff;
-        cpu.a = 0x10;
-        common_execute(&mut cpu, &mut bus, 0x48);
-        assert_eq!(cpu.a, 0x10);
-        assert_eq!(bus.read_u8(0x01ff), 0x10);
-    }
-
-    #[test]
-    fn test_pla() {
-        let (mut cpu, mut bus) = init();        
-        cpu.sp = 0xff;
-
-        cpu.a = 0x10;
-        common_execute(&mut cpu, &mut bus, 0x48); // push
-        cpu.a = 0x11; 
-        common_execute(&mut cpu, &mut bus, 0x68); // pull        
-        assert_eq!(cpu.a, 0x10); // should override accumulator
-        assert_eq!(cpu.sp, 0xff);
-
-        // Test zero flag
-        cpu.flags = 0b0000_0000;
-        cpu.a = 0x0;
-        common_execute(&mut cpu, &mut bus, 0x48);
-        cpu.a = 0x1; 
-        common_execute(&mut cpu, &mut bus, 0x68); 
-        assert_eq!(cpu.a, 0x0); 
-        assert_eq!(cpu.flags, 0b0000_0010);
-        assert_eq!(cpu.sp, 0xff);
-
-        // Test negative flag
-        cpu.flags = 0b0000_0000;
-        cpu.a = 0xff;
-        common_execute(&mut cpu, &mut bus, 0x48);
-        cpu.a = 0x1; 
-        common_execute(&mut cpu, &mut bus, 0x68); 
-        assert_eq!(cpu.a, 0xff); 
-        assert_eq!(cpu.flags, 0b1000_0000);
-        assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]

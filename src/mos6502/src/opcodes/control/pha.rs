@@ -1,13 +1,12 @@
 use bus::Bus;
 use super::Mos6502;
 use super::Instruction;
-use crate::Flags::*;
 
-/// CLV - Clear Overflow Flag
-/// Clears the overflow flag.
-pub fn clv(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
+/// PHA - Push Accumulator
+/// Pushes a copy of the accumulator on to the stack.
+pub fn pha(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.clear_flag(Overflow);
+    cpu.stack_push(cpu.a, bus);
     cpu.pc += inst.bytes as u16;
     0
 }
@@ -18,7 +17,7 @@ mod tests {
     use super::*;
     use crate::opcodes::{OPTABLE};
 
-    const OPCODE_NAME: &str = "CLV";
+    const OPCODE_NAME:&str = "PHA";
 
     fn init() -> (Mos6502, Bus) {
         (Mos6502::new(), Bus::new())
@@ -26,7 +25,7 @@ mod tests {
 
     #[test]
     fn implicit() {
-        let opcode = OPTABLE[0xb8];
+        let opcode = OPTABLE[0x48];
         assert_eq!(opcode.mode, Implicit);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -34,16 +33,17 @@ mod tests {
         cpu.sp = 0xff;
         cpu.pc = 0x0800;
         cpu.flags = 0b1100_1111;
-        cpu.a = 0;
+        cpu.a = 0x10;
         cpu.x = 0;
         cpu.y = 0;
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.flags, 0b1000_1111);
-        assert_eq!(cpu.a, 0);
+        assert_eq!(cpu.flags, 0b1100_1111);
+        assert_eq!(cpu.a, 0x10);
         assert_eq!(cpu.x, 0);
         assert_eq!(cpu.y, 0);
         assert_eq!(cpu.pc, 0x0801);
-        assert_eq!(cpu.sp, 0xff);
+        assert_eq!(cpu.sp, 0xfe);
+        assert_eq!(bus.read_u8(0x01ff), 0x10);
     }
 }

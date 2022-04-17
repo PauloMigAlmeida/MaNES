@@ -9,7 +9,7 @@ use crate::Flags::*;
 pub fn cli(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.clear_flag(Interrupt);
-    cpu.pc += 1;
+    cpu.pc += inst.bytes as u16;
     0
 }
 
