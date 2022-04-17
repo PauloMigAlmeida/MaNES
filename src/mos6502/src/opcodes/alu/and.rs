@@ -3,6 +3,11 @@ use crate::Flags::{Negative, Zero};
 use super::Mos6502;
 use super::Instruction;
 
+/// AND - Logical AND
+/// A,Z,N = A&M
+///
+/// A logical AND is performed, bit by bit, on the accumulator contents using the contents of a
+/// byte of memory.
 pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
 

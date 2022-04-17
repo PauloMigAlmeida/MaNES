@@ -1,23 +1,25 @@
 use bus::Bus;
-use crate::Flags::{Negative, Zero};
+use crate::Flags::{Carry, Negative, Zero};
 use super::Mos6502;
 use super::Instruction;
 
-/// EOR - Exclusive OR
-/// A,Z,N = A^M
-///
-/// An exclusive OR is performed, bit by bit, on the accumulator contents using the contents of a
-/// byte of memory.
-pub fn eor(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
+/// CMP - Compare
+/// Z,C,N = A-M
+/// This instruction compares the contents of the accumulator with another memory held value and
+/// sets the zero and carry flags as appropriate.
+pub fn cmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     let (fetched, additional_cycle) = cpu.address_mode_fetch(bus, &inst);
-    cpu.a = cpu.a ^ fetched;
 
-    if cpu.a == 0 {
+    if cpu.a == fetched {
         cpu.set_flag(Zero);
     }
 
-    if cpu.a & 0x80 == 0x80 {
+    if cpu.a >= fetched {
+        cpu.set_flag(Carry);
+    }
+
+    if (cpu.a - fetched) & 0x80 == 0x80 {
         cpu.set_flag(Negative);
     }
     cpu.pc += inst.bytes as u16;
@@ -30,7 +32,7 @@ mod tests {
     use super::*;
     use crate::opcodes::{OPTABLE};
 
-    const OPCODE_NAME:&str = "EOR";
+    const OPCODE_NAME:&str = "CMP";
 
     fn init() -> (Mos6502, Bus) {
         (Mos6502::new(), Bus::new())
@@ -38,7 +40,7 @@ mod tests {
 
     #[test]
     fn immediate() {
-        let opcode = OPTABLE[0x49];
+        let opcode = OPTABLE[0xC9];
         assert_eq!(opcode.mode, Immediate);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -51,12 +53,12 @@ mod tests {
         bus.write_u8(cpu.pc + 1, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);
 
-        // Zero flag set
+        // Zero and Carry flags set
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -65,29 +67,29 @@ mod tests {
         bus.write_u8(cpu.pc + 1, 0b0000_0001);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0000);
-        assert_eq!(cpu.flags, 0b0000_0010);
+        assert_eq!(cpu.a, 0b0000_0001);
+        assert_eq!(cpu.flags, 0b0000_0011);
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);
 
-        // Negative flag set
+        // Negative && Carry flag set
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
-        cpu.a = 0b0000_0000;
+        cpu.a = 0b1000_0101;
         cpu.pc = 0x10;
-        bus.write_u8(cpu.pc + 1, 0b1000_0000);
+        bus.write_u8(cpu.pc + 1, 0b0000_0101);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b1000_0000);
-        assert_eq!(cpu.flags, 0b1000_0000);
+        assert_eq!(cpu.a, 0b1000_0101);
+        assert_eq!(cpu.flags, 0b1000_0001);
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
     fn zero_page() {
-        let opcode = OPTABLE[0x45];
+        let opcode = OPTABLE[0xC5];
         assert_eq!(opcode.mode, ZeroPage);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -100,15 +102,15 @@ mod tests {
         bus.write_u8(0x10, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
     fn zero_page_x() {
-        let opcode = OPTABLE[0x55];
+        let opcode = OPTABLE[0xD5];
         assert_eq!(opcode.mode, ZeroPageX);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -122,15 +124,15 @@ mod tests {
         bus.write_u8(0x11, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
     fn absolute() {
-        let opcode = OPTABLE[0x4D];
+        let opcode = OPTABLE[0xCD];
         assert_eq!(opcode.mode, Absolute);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -143,15 +145,15 @@ mod tests {
         bus.write_u8(0x1234, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
     fn absolute_x() {
-        let opcode = OPTABLE[0x5D];
+        let opcode = OPTABLE[0xDD];
         assert_eq!(opcode.mode, AbsoluteX);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -166,8 +168,8 @@ mod tests {
         bus.write_u8(0x1235, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
 
@@ -182,15 +184,15 @@ mod tests {
         bus.write_u8(0x1333, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
     fn absolute_y() {
-        let opcode = OPTABLE[0x59];
+        let opcode = OPTABLE[0xD9];
         assert_eq!(opcode.mode, AbsoluteY);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -205,8 +207,8 @@ mod tests {
         bus.write_u8(0x1235, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
 
@@ -221,15 +223,15 @@ mod tests {
         bus.write_u8(0x1333, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
     fn indirect_x() {
-        let opcode = OPTABLE[0x41];
+        let opcode = OPTABLE[0xC1];
         assert_eq!(opcode.mode, IndirectX);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -244,15 +246,16 @@ mod tests {
         bus.write_u8(0x1234, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
+
     }
 
     #[test]
     fn indirect_y() {
-        let opcode = OPTABLE[0x51];
+        let opcode = OPTABLE[0xD1];
         assert_eq!(opcode.mode, IndirectY);
         assert_eq!(opcode.name, OPCODE_NAME);
 
@@ -269,8 +272,8 @@ mod tests {
         bus.write_u8(0x1234 + cpu.y as u16, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
 
@@ -287,8 +290,8 @@ mod tests {
         bus.write_u8(0x1234 + cpu.y as u16, 0b0000_1010);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1);
-        assert_eq!(cpu.a, 0b0000_0110);
-        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.a, 0b0000_1100);
+        assert_eq!(cpu.flags, 0b0000_0001);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
     }
