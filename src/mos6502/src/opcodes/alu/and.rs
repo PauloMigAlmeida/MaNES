@@ -19,7 +19,7 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
 }
 
 #[cfg(test)]
-mod test{
+mod tests{
 
     use super::*;
     use crate::opcodes::{OPTABLE};
