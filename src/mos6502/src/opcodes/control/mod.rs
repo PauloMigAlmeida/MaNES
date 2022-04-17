@@ -1,8 +1,20 @@
 mod cli;
+mod sei;
+mod clc;
+mod sec;
+mod clv;
+mod cld;
+mod sed;
 use bus::Bus;
 use super::Flags::*;
 use super::{Mos6502, Instruction};
 pub use cli::*;
+pub use sei::*;
+pub use clc::*;
+pub use sec::*;
+pub use clv::*;
+pub use cld::*;
+pub use sed::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -30,26 +42,8 @@ pub fn bpl(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-/// CLC - Clear Carry Flag
-/// Set the carry flag to zero.
-pub fn clc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.clear_flag(Carry);
-    cpu.pc += 1;
-    0
-}
-
 pub fn jmp(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-/// SEI - Set Interrupt Disable
-/// Set the interrupt disable flag to one.
-pub fn sei(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.set_flag(Interrupt);
-    cpu.pc += 1;
     0
 }
 
@@ -127,15 +121,6 @@ pub fn rti(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     0
 }
 
-/// SEC - Set Carry Flag
-/// Set the carry flag to one.
-pub fn sec(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.set_flag(Carry);
-    cpu.pc += 1;
-    0
-}
-
 pub fn bit(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
@@ -189,15 +174,6 @@ pub fn bcs(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-/// CLV - Clear Overflow Flag
-/// Clears the overflow flag.
-pub fn clv(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.clear_flag(Overflow);
-    cpu.pc += 1;
-    0
-}
-
 pub fn cpy(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
@@ -213,15 +189,6 @@ pub fn bne(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-/// CLD - Clear Decimal Mode
-/// Sets the decimal mode flag to zero.
-pub fn cld(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.clear_flag(Decimal);
-    cpu.pc += 1;
-    0
-}
-
 pub fn cpx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
@@ -234,15 +201,6 @@ pub fn inx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
 
 pub fn beq(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-/// SED - Set Decimal Flag
-/// Set the decimal mode flag to one.
-pub fn sed(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.set_flag(Decimal);
-    cpu.pc += 1;
     0
 }
 
@@ -268,54 +226,6 @@ mod tests {
         let (mut cpu, mut bus) = init();
         cpu.execute_instruction(0x00, &mut bus);
         assert_eq!(cpu.a, 0x00);
-    }
-
-    #[test]
-    fn test_sei() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_1011;
-        common_execute(&mut cpu, &mut bus, 0x78);
-        assert_eq!(cpu.flags, 0b1100_1111);        
-    }
-
-    #[test]
-    fn test_clc() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_1111;
-        common_execute(&mut cpu, &mut bus, 0x18);
-        assert_eq!(cpu.flags, 0b1100_1110);
-    }
-
-    #[test]
-    fn test_sec() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_1110;
-        common_execute(&mut cpu, &mut bus, 0x38);
-        assert_eq!(cpu.flags, 0b1100_1111);
-    }
-
-    #[test]
-    fn test_clv() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_1111;
-        common_execute(&mut cpu, &mut bus, 0xb8);
-        assert_eq!(cpu.flags, 0b1000_1111);
-    }
-
-    #[test]
-    fn test_cld() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_1111;
-        common_execute(&mut cpu, &mut bus, 0xd8);
-        assert_eq!(cpu.flags, 0b1100_0111);
-    }
-
-    #[test]
-    fn test_sed() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_0111;
-        common_execute(&mut cpu, &mut bus, 0xf8);
-        assert_eq!(cpu.flags, 0b1100_1111);
     }
 
     #[test]
