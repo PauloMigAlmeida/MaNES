@@ -8,6 +8,8 @@ mod sed;
 mod sty;
 mod pha;
 mod pla;
+mod php;
+mod plp;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -20,6 +22,8 @@ pub use sed::*;
 pub use sty::*;
 pub use pha::*;
 pub use pla::*;
+pub use php::*;
+pub use plp::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -30,15 +34,6 @@ pub use pla::*;
 /// in the status set to one.
 pub fn brk(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-/// PHP - Push Processor Status
-/// Pushes a copy of the status flags on to the stack.
-pub fn php(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.stack_push(cpu.flags, bus);
-    cpu.pc += 1;
     0
 }
 
@@ -102,14 +97,6 @@ pub fn rti(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
 
 pub fn bit(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn plp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    let value = cpu.stack_pull(bus);
-    cpu.flags = value;
-    cpu.pc += 1;
     0
 }
 
@@ -185,37 +172,6 @@ mod tests {
 
     fn init() -> (Mos6502, Bus) {
         (Mos6502::new(), Bus::new())
-    }
-
-    fn common_execute(cpu: &mut Mos6502, bus: &mut Bus, opcode: usize) {
-        let opcode = OPTABLE[opcode];
-        let old_pc = cpu.pc;
-        let cycles = cpu.execute_instruction(opcode.opcode, bus);
-        assert_eq!(cycles, opcode.cycles);
-        assert_eq!(old_pc + opcode.bytes as u16, cpu.pc);
-    }
-
-    #[test]
-    fn test_php() {
-        let (mut cpu, mut bus) = init();
-        cpu.sp = 0xff;
-        cpu.flags = 0b1100_1110;
-        common_execute(&mut cpu, &mut bus, 0x08);
-        assert_eq!(cpu.flags, 0b1100_1110);
-        assert_eq!(bus.read_u8(0x01ff), 0b1100_1110);
-    }
-
-    #[test]
-    fn test_plp() {
-        let (mut cpu, mut bus) = init();
-        cpu.sp = 0xff;
-
-        cpu.flags = 0b1100_1110;
-        common_execute(&mut cpu, &mut bus, 0x08); // php
-        cpu.flags = 0;
-        common_execute(&mut cpu, &mut bus, 0x28); //plp
-        assert_eq!(cpu.flags, 0b1100_1110);
-        assert_eq!(cpu.sp, 0xff);
     }
 
     #[test]
