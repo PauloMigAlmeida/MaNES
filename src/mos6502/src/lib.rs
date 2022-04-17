@@ -91,6 +91,12 @@ impl Mos6502 {
                 addr = (addr + self.x as u16) % 256;
                 bus.read_u8(addr)
             },
+            ZeroPageY => {
+                // val = PEEK((arg + Y) % 256) to simulate hardware bug in 6502
+                let mut addr = bus.read_u8(self.pc + 1) as u16;
+                addr = (addr + self.y as u16) % 256;
+                bus.read_u8(addr)
+            },
             Absolute => {
                 let addr = bus.read_u16(self.pc + 1);
                 bus.read_u8(addr)

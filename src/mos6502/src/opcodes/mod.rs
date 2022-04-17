@@ -202,7 +202,7 @@ pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x8b, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0x8c, name: "STY", mode: Absolute,     bytes: 3, cycles: 4, function: sty },
     Instruction { opcode: 0x8d, name: "STA", mode: Absolute,     bytes: 3, cycles: 4, function: sta },
-    Instruction { opcode: 0x8e, name: "STX", mode: Absolute,     bytes: 3, cycles: 4, function: sta },
+    Instruction { opcode: 0x8e, name: "STX", mode: Absolute,     bytes: 3, cycles: 4, function: stx },
     Instruction { opcode: 0x8f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
 
     Instruction { opcode: 0x90, name: "BCC", mode: Relative,    bytes: 2, cycles: 2, function: bcc },
