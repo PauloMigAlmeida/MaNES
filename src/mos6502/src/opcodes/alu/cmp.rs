@@ -10,18 +10,9 @@ use super::Instruction;
 pub fn cmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     let (fetched, additional_cycle) = cpu.address_mode_fetch(bus, &inst);
-
-    if cpu.a == fetched {
-        cpu.set_flag(Zero);
-    }
-
-    if cpu.a >= fetched {
-        cpu.set_flag(Carry);
-    }
-
-    if (cpu.a - fetched) & 0x80 == 0x80 {
-        cpu.set_flag(Negative);
-    }
+    cpu.set_flag_cond(Zero, cpu.a == fetched);
+    cpu.set_flag_cond(Carry, cpu.a >= fetched);
+    cpu.set_flag_cond(Negative, (cpu.a - fetched) & 0x80 == 0x80 );
     cpu.pc += inst.bytes as u16;
     additional_cycle
 }

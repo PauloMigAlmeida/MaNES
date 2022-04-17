@@ -47,6 +47,12 @@ impl Mos6502 {
         self.flags &= value;
     }
 
+    pub fn set_flag_cond(&mut self, flag: Flags, cond: bool) {
+        if cond {
+            self.set_flag(flag);
+        }
+    }
+
     pub fn stack_push(&mut self, value: u8, bus: &mut Bus) {
         if self.sp == 0 {
             panic!("Can't push more data into the stack");
