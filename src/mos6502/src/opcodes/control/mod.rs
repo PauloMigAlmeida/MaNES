@@ -1,6 +1,8 @@
+mod cli;
 use bus::Bus;
 use super::Flags::*;
 use super::{Mos6502, Instruction};
+pub use cli::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -39,16 +41,6 @@ pub fn clc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
 
 pub fn jmp(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-/// CLI - Clear Interrupt Disable
-/// Clears the interrupt disable flag allowing normal interrupt
-/// requests to be serviced.
-pub fn cli(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.clear_flag(Interrupt);
-    cpu.pc += 1;
     0
 }
 
@@ -276,14 +268,6 @@ mod tests {
         let (mut cpu, mut bus) = init();
         cpu.execute_instruction(0x00, &mut bus);
         assert_eq!(cpu.a, 0x00);
-    }
-
-    #[test]
-    fn test_cli() {
-        let (mut cpu, mut bus) = init();        
-        cpu.flags = 0b1100_1111;
-        common_execute(&mut cpu, &mut bus, 0x58);
-        assert_eq!(cpu.flags, 0b1100_1011);        
     }
 
     #[test]

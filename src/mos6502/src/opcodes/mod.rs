@@ -192,7 +192,7 @@ pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x81, name: "STA", mode: IndirectX,   bytes: 2, cycles: 6, function: sta },
     Instruction { opcode: 0x82, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0x83, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
-    Instruction { opcode: 0x84, name: "STI", mode: ZeroPage,    bytes: 2, cycles: 3, function: sty },
+    Instruction { opcode: 0x84, name: "STY", mode: ZeroPage,    bytes: 2, cycles: 3, function: sty },
     Instruction { opcode: 0x85, name: "STA", mode: ZeroPage,    bytes: 2, cycles: 3, function: sta },
     Instruction { opcode: 0x86, name: "STX", mode: ZeroPage,    bytes: 2, cycles: 3, function: stx },
     Instruction { opcode: 0x87, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
