@@ -53,6 +53,11 @@ impl Mos6502 {
         }
     }
 
+    pub fn is_flag_set(&self, flag: Flags) -> bool {
+        let flag_value = flag as u8;
+        self.flags & (1 << flag_value) == (1 << flag_value)
+    }
+
     pub fn stack_push(&mut self, value: u8, bus: &mut Bus) {
         if self.sp == 0 {
             panic!("Can't push more data into the stack");
