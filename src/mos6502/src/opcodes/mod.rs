@@ -248,7 +248,7 @@ pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0xb6, name: "LDX", mode: ZeroPageX,   bytes: 2, cycles: 4, function: ldx },
     Instruction { opcode: 0xb7, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0xb8, name: "CLV", mode: Implicit,    bytes: 1, cycles: 2, function: clv },
-    Instruction { opcode: 0xb9, name: "LDA", mode: ZeroPageY,   bytes: 2, cycles: 4, function: lda },
+    Instruction { opcode: 0xb9, name: "LDA", mode: AbsoluteY,   bytes: 3, cycles: 4, function: lda },
     Instruction { opcode: 0xba, name: "TSX", mode: Implicit,    bytes: 1, cycles: 2, function: tsx },
     Instruction { opcode: 0xbb, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0xbc, name: "LDY", mode: AbsoluteX,   bytes: 3, cycles: 4, function: ldy },
