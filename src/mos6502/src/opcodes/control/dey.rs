@@ -79,7 +79,20 @@ mod tests{
         cpu.pc = 0x10;
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(cpu.y, 0b1111_1111);
+        assert_eq!(cpu.y, 0b1111_1111); // -1 two's complement
+        assert_eq!(cpu.flags, 0b1000_0000);
+        assert_eq!(cpu.pc, 0x11);
+        assert_eq!(cpu.sp, 0xff);
+
+        // negative flag set, decrement negative numbers
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b1000_0000;
+        cpu.y = 0b1111_0110; // -10 two's complement
+        cpu.pc = 0x10;
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.y, 0b1111_0101); // -11 two's complement);
         assert_eq!(cpu.flags, 0b1000_0000);
         assert_eq!(cpu.pc, 0x11);
         assert_eq!(cpu.sp, 0xff);
