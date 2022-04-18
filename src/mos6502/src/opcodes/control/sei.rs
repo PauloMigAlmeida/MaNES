@@ -1,7 +1,5 @@
 use bus::Bus;
-use super::Mos6502;
-use super::Instruction;
-use crate::Flags::*;
+use crate::{Mos6502, Instruction, Flags::*};
 
 /// SEI - Set Interrupt Disable
 /// Set the interrupt disable flag to one.

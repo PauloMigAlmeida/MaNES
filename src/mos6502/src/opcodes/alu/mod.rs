@@ -6,7 +6,6 @@ mod lda;
 mod sta;
 mod adc;
 mod sbc;
-use super::{Mos6502, Instruction};
 pub use and::*;
 pub use ora::*;
 pub use eor::*;

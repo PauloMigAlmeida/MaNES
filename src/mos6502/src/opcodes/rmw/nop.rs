@@ -1,6 +1,5 @@
 use bus::Bus;
-use super::Mos6502;
-use super::Instruction;
+use crate::{Mos6502, Instruction};
 
 /// NOP - No Operation
 /// The NOP instruction causes no changes to the processor other than the normal incrementing

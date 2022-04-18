@@ -1,7 +1,5 @@
 use bus::Bus;
-use super::Mos6502;
-use super::Instruction;
-use crate::Flags::*;
+use crate::{Mos6502, Instruction, Flags::*};
 
 /// CLD - Clear Decimal Mode
 /// Sets the decimal mode flag to zero.

@@ -1,7 +1,5 @@
 use bus::Bus;
-use crate::Flags::{Negative, Zero};
-use super::Mos6502;
-use super::Instruction;
+use crate::{Mos6502, Instruction, Flags::*};
 
 /// PLA - Pull Accumulator
 /// Pulls an 8 bit value from the stack and into the accumulator.

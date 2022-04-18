@@ -1,7 +1,5 @@
 use bus::Bus;
-use crate::Flags::{Carry, Negative, Overflow, Zero};
-use super::Mos6502;
-use super::Instruction;
+use crate::{Mos6502, Instruction, Flags::*};
 
 /// ADC - Add with Carry
 /// A,Z,C,N = A+M+C

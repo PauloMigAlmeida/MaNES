@@ -1,7 +1,5 @@
 use bus::Bus;
-use super::Mos6502;
-use super::Instruction;
-use crate::Flags::*;
+use crate::{Mos6502, Instruction, Flags::*};
 
 /// CLI - Clear Interrupt Disable
 /// Clears the interrupt disable flag allowing normal interrupt
