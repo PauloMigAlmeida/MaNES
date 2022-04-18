@@ -14,10 +14,10 @@ pub fn adc(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     let tmp = cpu.a as u16 + fetched as u16 + (if cpu.is_flag_set(Carry) { 1 } else { 0 } );
     let result = (tmp & 0xff) as u8;
 
-    cpu.set_flag_cond(Carry, tmp > 0x00ff);
-    cpu.set_flag_cond(Zero, result == 0);
-    cpu.set_flag_cond(Negative, (result & 0x80) == 0x80);
-    cpu.set_flag_cond(Overflow, ((cpu.a ^ result) & (fetched ^ result) & 0x80) == 0x80);
+    cpu.write_flag_cond(Carry, tmp > 0x00ff);
+    cpu.write_flag_cond(Zero, result == 0);
+    cpu.write_flag_cond(Negative, (result & 0x80) == 0x80);
+    cpu.write_flag_cond(Overflow, ((cpu.a ^ result) & (fetched ^ result) & 0x80) == 0x80);
 
     cpu.a = result;
     cpu.pc += inst.bytes as u16;
@@ -52,6 +52,20 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 22);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x12);
+        assert_eq!(cpu.sp, 0xff);
+
+        // Carry set before op, it should clear carry after execution
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0001;
+        cpu.a = 12;
+        cpu.pc = 0x10;
+        bus.write_u8(cpu.pc + 1, 10);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 23);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);

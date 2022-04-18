@@ -13,10 +13,10 @@ pub fn sbc(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     let (data1, is_carry1) = cpu.a.overflowing_sub(fetched);
     let (result, is_carry2) = data1.overflowing_sub(if cpu.is_flag_set(Carry) { 0 } else { 1 } );
 
-    cpu.set_flag_cond(Carry, !(is_carry1 || is_carry2));
-    cpu.set_flag_cond(Zero, result == 0);
-    cpu.set_flag_cond(Negative, (result & 0x80) == 0x80);
-    cpu.set_flag_cond(Overflow, (((cpu.a ^ fetched) & 0x80) == 0x80) && (((cpu.a ^ result) & 0x80) == 0x80));
+    cpu.write_flag_cond(Carry, !(is_carry1 || is_carry2));
+    cpu.write_flag_cond(Zero, result == 0);
+    cpu.write_flag_cond(Negative, (result & 0x80) == 0x80);
+    cpu.write_flag_cond(Overflow, (((cpu.a ^ fetched) & 0x80) == 0x80) && (((cpu.a ^ result) & 0x80) == 0x80));
 
     cpu.a = result;
     cpu.pc += inst.bytes as u16;

@@ -10,26 +10,31 @@ pub fn and(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     let (fetched, additional_cycle) = cpu.address_mode_fetch(bus, &inst);
     cpu.a = cpu.a & fetched;
-    cpu.set_flag_cond(Zero, cpu.a == 0);
-    cpu.set_flag_cond(Negative, cpu.a & 0x80 == 0x80 );
+    cpu.write_flag_cond(Zero, cpu.a == 0);
+    cpu.write_flag_cond(Negative, cpu.a & 0x80 == 0x80 );
     cpu.pc += inst.bytes as u16;
     additional_cycle
 }
 
 #[cfg(test)]
 mod tests{
-
+    use crate::{Absolute, AbsoluteX, AbsoluteY, Immediate, IndirectX, IndirectY, ZeroPage, ZeroPageX};
     use super::*;
     use crate::opcodes::{OPTABLE};
+
+    const OPCODE_NAME:&str = "AND";
 
     fn init() -> (Mos6502, Bus) {
         (Mos6502::new(), Bus::new())
     }
 
     #[test]
-    fn test_and() {
-        // Immediate mode, no flags set
+    fn immediate() {
         let opcode = OPTABLE[0x29];
+        assert_eq!(opcode.mode, Immediate);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags set
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -43,7 +48,21 @@ mod tests{
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);
 
-        // Immediate mode, zero flag set
+        // test zero flag clear
+        let (mut cpu, mut bus) = init();
+        cpu.sp = 0xff;
+        cpu.flags = 0b0000_0010;
+        cpu.a = 0b0000_1100;
+        cpu.pc = 0x10;
+        bus.write_u8(cpu.pc + 1, 0b0000_1000);
+        let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
+        assert_eq!(cycles, opcode.cycles);
+        assert_eq!(cpu.a, 0b0000_1000);
+        assert_eq!(cpu.flags, 0b0000_0000);
+        assert_eq!(cpu.pc, 0x12);
+        assert_eq!(cpu.sp, 0xff);
+
+        // zero flag set
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -57,7 +76,7 @@ mod tests{
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);
 
-        // Immediate mode, negative flag set
+        // negative flag set
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -70,9 +89,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b1000_0000);
         assert_eq!(cpu.pc, 0x12);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // ZeroPage mode, no flags
+    #[test]
+    fn zero_page() {
         let opcode = OPTABLE[0x25];
+        assert_eq!(opcode.mode, ZeroPage);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -86,9 +111,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // ZeroPage X mode, no flags
+    #[test]
+    fn zero_page_x() {
         let opcode = OPTABLE[0x35];
+        assert_eq!(opcode.mode, ZeroPageX);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -104,7 +135,7 @@ mod tests{
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
 
-        // ZeroPage X mode (with hardware page wrap around 'bug'), no flags
+        // page wrap around, no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -119,9 +150,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // Absolute mode, no flags
+    #[test]
+    fn absolute() {
         let opcode = OPTABLE[0x2D];
+        assert_eq!(opcode.mode, Absolute);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -135,9 +172,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // Absolute X mode, no flags
+    #[test]
+    fn absolute_x() {
         let opcode = OPTABLE[0x3D];
+        assert_eq!(opcode.mode, AbsoluteX);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -153,8 +196,7 @@ mod tests{
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
 
-        // Absolute X mode, no flags, page crossed
-        let opcode = OPTABLE[0x3D];
+        // no flags, page crossed
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -169,9 +211,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // Absolute Y mode, no flags
+    #[test]
+    fn absolute_y() {
         let opcode = OPTABLE[0x39];
+        assert_eq!(opcode.mode, AbsoluteY);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -187,8 +235,7 @@ mod tests{
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
 
-        // Absolute Y mode, no flags, page crossed
-        let opcode = OPTABLE[0x39];
+        // no flags, page crossed
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -203,9 +250,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // Indirect X mode, no flags
+    #[test]
+    fn indirect_x() {
         let opcode = OPTABLE[0x21];
+        assert_eq!(opcode.mode, IndirectX);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -221,9 +274,15 @@ mod tests{
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
+    }
 
-        // Indirect Y mode, no flags
+    #[test]
+    fn indirect_y() {
         let opcode = OPTABLE[0x31];
+        assert_eq!(opcode.mode, IndirectY);
+        assert_eq!(opcode.name, OPCODE_NAME);
+
+        // no flags
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;
@@ -242,8 +301,7 @@ mod tests{
         assert_eq!(cpu.sp, 0xff);
 
 
-        // Indirect Y mode, no flags, page crossed
-        let opcode = OPTABLE[0x31];
+        // no flags, page crossed
         let (mut cpu, mut bus) = init();
         cpu.sp = 0xff;
         cpu.flags = 0b0000_0000;

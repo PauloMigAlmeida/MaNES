@@ -1,5 +1,5 @@
 use bus::Bus;
-use crate::{Mos6502, Instruction, Flags::*};
+use crate::{Mos6502, Instruction};
 
 /// PHP - Push Processor Status
 /// Pushes a copy of the status flags on to the stack.

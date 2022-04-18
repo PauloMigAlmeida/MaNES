@@ -9,8 +9,8 @@ pub fn lda(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     let (fetched, additional_cycle) = cpu.address_mode_fetch(bus, &inst);
     cpu.a = fetched;
-    cpu.set_flag_cond(Zero, cpu.a == 0);
-    cpu.set_flag_cond(Negative, cpu.a & 0x80 == 0x80);
+    cpu.write_flag_cond(Zero, cpu.a == 0);
+    cpu.write_flag_cond(Negative, cpu.a & 0x80 == 0x80);
     cpu.pc += inst.bytes as u16;
     additional_cycle
 }

@@ -47,9 +47,11 @@ impl Mos6502 {
         self.flags &= value;
     }
 
-    pub fn set_flag_cond(&mut self, flag: Flags, cond: bool) {
+    pub fn write_flag_cond(&mut self, flag: Flags, cond: bool) {
         if cond {
             self.set_flag(flag);
+        }else {
+            self.clear_flag(flag);
         }
     }
 
