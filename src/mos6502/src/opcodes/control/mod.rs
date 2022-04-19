@@ -16,6 +16,7 @@ mod bpl;
 mod bvs;
 mod bvc;
 mod bcc;
+mod bcs;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -36,6 +37,7 @@ pub use bpl::*;
 pub use bvs::*;
 pub use bvc::*;
 pub use bcc::*;
+pub use bcs::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -108,11 +110,6 @@ pub fn tya(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
 }
 
 pub fn tay(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn bcs(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
