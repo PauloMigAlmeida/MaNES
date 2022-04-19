@@ -87,7 +87,7 @@ impl Mos6502 {
         let mut additional_cycle= 0;
 
         let fetched= match inst.mode {
-            Immediate => bus.read_u8(self.pc + 1),
+            Immediate | Relative => bus.read_u8(self.pc + 1),
             ZeroPage => {
                 let addr = bus.read_u8(self.pc + 1);
                 bus.read_u8(addr as u16)
@@ -152,7 +152,7 @@ impl Mos6502 {
                 }
 
                 bus.read_u8(addr)
-            }
+            },
             _ => panic!("invalid addressing mode... aborting"),
         };
         (fetched, additional_cycle)

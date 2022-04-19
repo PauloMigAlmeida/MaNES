@@ -12,6 +12,7 @@ mod php;
 mod plp;
 mod dey;
 mod ldy;
+mod bpl;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -28,6 +29,7 @@ pub use php::*;
 pub use plp::*;
 pub use dey::*;
 pub use ldy::*;
+pub use bpl::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -37,11 +39,6 @@ pub use ldy::*;
 /// IRQ interrupt vector at $FFFE/F is loaded into the PC and the break flag 
 /// in the status set to one.
 pub fn brk(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn bpl(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
