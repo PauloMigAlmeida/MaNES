@@ -17,6 +17,8 @@ mod bvs;
 mod bvc;
 mod bcc;
 mod bcs;
+mod beq;
+mod bmi;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -38,6 +40,8 @@ pub use bvs::*;
 pub use bvc::*;
 pub use bcc::*;
 pub use bcs::*;
+pub use beq::*;
+pub use bmi::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -99,11 +103,6 @@ pub fn bit(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn bmi(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
 pub fn tya(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
@@ -135,11 +134,6 @@ pub fn cpx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
 }
 
 pub fn inx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn beq(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
