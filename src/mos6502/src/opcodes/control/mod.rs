@@ -14,6 +14,7 @@ mod dey;
 mod ldy;
 mod bpl;
 mod bvs;
+mod bvc;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -32,6 +33,7 @@ pub use dey::*;
 pub use ldy::*;
 pub use bpl::*;
 pub use bvs::*;
+pub use bvc::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -51,11 +53,6 @@ pub fn jmp(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
 }
 
 pub fn jsr(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn bvc(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
