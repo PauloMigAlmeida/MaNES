@@ -21,6 +21,8 @@ mod beq;
 mod bmi;
 mod bne;
 mod bit;
+mod tya;
+mod tay;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -46,6 +48,8 @@ pub use beq::*;
 pub use bmi::*;
 pub use bne::*;
 pub use bit::*;
+pub use tya::*;
+pub use tay::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -99,16 +103,6 @@ pub fn rti(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     value |= cpu.stack_pull(bus) as u16;
     cpu.pc = value;
 
-    0
-}
-
-pub fn tya(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn tay(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
