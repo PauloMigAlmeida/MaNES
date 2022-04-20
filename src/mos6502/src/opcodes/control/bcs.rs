@@ -10,14 +10,11 @@ pub fn bcs(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     let mut additional_cycles = 0;
 
     if cpu.is_flag_set(Carry) {
-        let mut target_addr = cpu.pc;
-        let signed_fetched = fetched as i8;
-
-        if signed_fetched < 0 {
-            target_addr -= signed_fetched.abs() as u16;
-        } else {
-            target_addr += fetched as u16;
+        let mut fetched = fetched as u16;
+        if fetched & 0x80 == 0x80 {
+            fetched |= 0xFF00;
         }
+        let target_addr = cpu.pc.overflowing_add(fetched).0;
 
         // check whether we crossed a page
         if (cpu.pc & 0xff00) != (target_addr & 0xff00) {
