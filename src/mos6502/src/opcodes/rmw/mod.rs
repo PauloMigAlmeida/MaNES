@@ -1,11 +1,15 @@
 mod stx;
 mod nop;
 mod ldx;
+mod tsx;
+mod txs;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use stx::*;
 pub use nop::*;
 pub use ldx::*;
+pub use tsx::*;
+pub use txs::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -34,17 +38,7 @@ pub fn txa(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     0
 }
 
-pub fn txs(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
 pub fn tax(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn tsx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
