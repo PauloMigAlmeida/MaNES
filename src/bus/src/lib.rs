@@ -5,15 +5,17 @@
 //
 //     - implement logic to write/read data to/from the right component in the bus
 
-const RAM_SIZE:u16 = 0xFFFF;
+const RAM_SIZE: u16 = 0xFFFF;
 
 pub struct Bus {
-    ram: [u8; RAM_SIZE as usize + 1]
+    ram: [u8; RAM_SIZE as usize + 1],
 }
 
 impl Bus {
     pub fn new() -> Self {
-        Bus{ ram: [0; RAM_SIZE as usize + 1] }
+        Bus {
+            ram: [0; RAM_SIZE as usize + 1],
+        }
     }
 
     pub fn read_u8(&self, addr: u16) -> u8 {
@@ -36,5 +38,4 @@ impl Bus {
         self.ram[addr as usize] = low;
         self.ram[(addr + 1) as usize] = high;
     }
-
 }
