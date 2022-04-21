@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 mos6502 = { path = "../mos6502"}
 bus = { path = "../bus"}
+gtk4 = "0.4.7"

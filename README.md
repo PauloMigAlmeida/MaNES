@@ -36,5 +36,9 @@ Forums:
 Books:
 - https://www.amazon.com/Rust-Rustaceans-Programming-Experienced-Developers/dp/1718501854/ 
 
+## Dependencies
 
-
+For Mac OS:
+```{bash}
+brew install gtk4
+```
