@@ -1,11 +1,9 @@
-use gtk::glib::clone;
-use gtk::prelude::*;
-use gtk::{
+use gtk4::glib::clone;
+use gtk4::prelude::*;
+use gtk4::{
     Align, Application, ApplicationWindow, Box, Button, FileChooserAction, FileChooserDialog,
-    Orientation, Paned, ResponseType,
+    GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, TextBuffer, TextView,
 };
-use gtk4 as gtk;
-use gtk4::{TextBuffer, TextView};
 
 fn main() {
     let application = Application::builder()
@@ -94,32 +92,95 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
     menu_bar
 }
 
-fn build_ui_content(window: &ApplicationWindow) -> Paned {
-    let ola1 = Button::with_label("Ola 1");
-    let ola2 = Button::with_label("Ola 2");
-
-    let disassembly_textview = TextView::builder()
-        .editable(true)
-        .accepts_tab(true)
-        .hexpand(true)
-        .vexpand(true)
-        .buffer(&TextBuffer::builder().text("Ola").build())
-        .build();
+fn build_ui_content(_window: &ApplicationWindow) -> Paned {
+    let left_side_pane = build_left_side_panes();
+    let right_side_pane = build_right_side_panes();
 
     let vertical_pane = Paned::builder()
         .orientation(Orientation::Horizontal)
-        .hexpand(false)
+        .hexpand(true)
         .halign(Align::Fill)
-        .vexpand(false)
+        .vexpand(true)
         .valign(Align::Fill)
         .margin_start(5)
         .margin_end(5)
         .margin_top(5)
-        .start_child(&disassembly_textview)
-        .end_child(&ola2)
+        .start_child(&left_side_pane)
+        .end_child(&right_side_pane)
         .build();
 
     vertical_pane.set_position(400); // derive this from window size somehow
 
     vertical_pane
+}
+
+fn build_left_side_panes() -> Paned {
+    let disassembly_textview = TextView::builder()
+        .editable(true)
+        .accepts_tab(false)
+        .halign(Align::Fill)
+        .valign(Align::Fill)
+        .buffer(&TextBuffer::builder().text("ROM Disassembly").build())
+        .build();
+
+    let disassembly_scroll = ScrolledWindow::builder()
+        .child(&disassembly_textview)
+        .halign(Align::Fill)
+        .valign(Align::Fill)
+        .vscrollbar_policy(PolicyType::Always)
+        .build();
+
+    let memory_textview = TextView::builder()
+        .editable(true)
+        .accepts_tab(false)
+        .halign(Align::Fill)
+        .valign(Align::Fill)
+        .buffer(
+            &TextBuffer::builder()
+                .text("Memory Area Visualisation")
+                .build(),
+        )
+        .build();
+
+    let memory_scroll = ScrolledWindow::builder()
+        .child(&memory_textview)
+        .halign(Align::Fill)
+        .valign(Align::Fill)
+        .vscrollbar_policy(PolicyType::Always)
+        .build();
+
+    Paned::builder()
+        .orientation(Orientation::Vertical)
+        .hexpand(true)
+        .halign(Align::Fill)
+        .vexpand(true)
+        .valign(Align::Fill)
+        .start_child(&disassembly_scroll)
+        .end_child(&memory_scroll)
+        .build()
+}
+
+fn build_right_side_panes() -> Paned {
+    let cpu_textview = TextView::builder()
+        .editable(true)
+        .accepts_tab(false)
+        .halign(Align::Fill)
+        .valign(Align::Fill)
+        .buffer(&TextBuffer::builder().text("CPU registers").build())
+        .build();
+
+    let game_display = GLArea::builder()
+        .halign(Align::Fill)
+        .valign(Align::Fill)
+        .build();
+
+    Paned::builder()
+        .orientation(Orientation::Vertical)
+        .hexpand(true)
+        .halign(Align::Fill)
+        .vexpand(true)
+        .valign(Align::Fill)
+        .start_child(&game_display)
+        .end_child(&cpu_textview)
+        .build()
 }
