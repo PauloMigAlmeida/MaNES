@@ -18,7 +18,7 @@ that I want to implement in the short to medium term.
 - [ ] Create a ROM Disassembler (somewhat similar to what objdump does)
 - [ ] Create simplified GUI that contains the framebuffer and a RAM view
 - [ ] Implement 1 Mapper (the simplest one) 
-- [ ] Write all of above in Rust (that's the secondary goal for this winter project)
+- [ ] Write all above in Rust (that's the secondary goal for this winter project)
 
 
 ## Stretch goals
@@ -41,4 +41,9 @@ Books:
 For Mac OS:
 ```{bash}
 brew install gtk4
+```
+
+For Fedora:
+```{bash}
+sudo dnf install gtk4-devel
 ```

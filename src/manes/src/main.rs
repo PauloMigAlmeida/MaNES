@@ -1,17 +1,22 @@
+use std::borrow::{Borrow, BorrowMut};
 use gtk4::glib::clone;
 use gtk4::prelude::*;
 use gtk4::{
     Align, Application, ApplicationWindow, Box, Button, FileChooserAction, FileChooserDialog,
     GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, TextBuffer, TextView,
 };
+use bus::Bus;
+use std::{cell::RefCell, rc::Rc};
+use std::ops::{Deref, DerefMut};
+use mos6502::Mos6502;
+use crate::ui::cpu_registers::cpu_register_curr_state;
+
+mod ui;
+use crate::ui::globals::{manes_app, manes_bus, manes_cpu, manes_cpu_regs_textview};
 
 fn main() {
-    let application = Application::builder()
-        .application_id("com.github.paulomigalmeida.MaNES")
-        .build();
-
-    application.connect_activate(build_ui);
-    application.run();
+    manes_app().connect_activate(build_ui);
+    manes_app().run();
 }
 
 fn build_ui(app: &Application) {
@@ -89,6 +94,21 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
         }
     ));
 
+
+    reset_button.connect_clicked(|_| {
+
+        // manes_cpu()
+        //     .as_ref()
+        //     .borrow_mut().stack_push(0x10, manes_bus().as_ref().borrow_mut().deref_mut());
+
+        manes_cpu_regs_textview()
+            .as_ref()
+            .set_buffer(Some(&TextBuffer::builder()
+                                .text(cpu_register_curr_state().as_str())
+                                .build())
+            );
+    });
+
     menu_bar
 }
 
@@ -161,18 +181,13 @@ fn build_left_side_panes() -> Paned {
 }
 
 fn build_right_side_panes() -> Paned {
-    let cpu_textview = TextView::builder()
-        .editable(true)
-        .accepts_tab(false)
-        .halign(Align::Fill)
-        .valign(Align::Fill)
-        .buffer(&TextBuffer::builder().text("CPU registers").build())
-        .build();
+    let cpu_textview = manes_cpu_regs_textview();
 
     let game_display = GLArea::builder()
         .halign(Align::Fill)
         .valign(Align::Fill)
         .build();
+
 
     Paned::builder()
         .orientation(Orientation::Vertical)
@@ -181,6 +196,6 @@ fn build_right_side_panes() -> Paned {
         .vexpand(true)
         .valign(Align::Fill)
         .start_child(&game_display)
-        .end_child(&cpu_textview)
+        .end_child(cpu_textview.as_ref())
         .build()
 }
