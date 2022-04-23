@@ -1,3 +1,4 @@
+use gtk4::prelude::*;
 use gtk4::{Application, TextView, Align, TextBuffer};
 use std::{cell::RefCell, rc::Rc};
 use mos6502::Mos6502;
@@ -13,15 +14,18 @@ thread_local!(
             .build()
     });
 
-    static MANES_CPU_REGS_TEXTVIEW: Rc<TextView> = Rc::new(
+    static MANES_CPU_REGS_TEXTVIEW: Rc<TextView> = Rc::new({
         TextView::builder()
-            .editable(true)
+            .editable(false)
             .accepts_tab(false)
             .halign(Align::Fill)
             .valign(Align::Fill)
+            .monospace(true)
+            .focusable(false)
+            .can_target(false)
             .buffer(&TextBuffer::builder().text(cpu_register_curr_state().as_str()).build())
             .build()
-    );
+    });
 
     static MANES_MOS6502_CPU: Rc<RefCell<Mos6502>> = Rc::new(
         RefCell::new(Mos6502::new())
