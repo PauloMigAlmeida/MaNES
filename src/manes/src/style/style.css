@@ -1,0 +1,22 @@
+window {
+    background-color: black;
+}
+
+.view#cpuregstextview, .view#cpuregstextview text, textview text#cpuregstextview,
+.view#memviewtextview, .view#memviewtextview text, textview text#memviewtextview,
+.view#disassemblytextview, .view#disassemblytextview text, textview text#disassemblytextview {
+    background-color: #3d3737;
+    color: #a484ff;
+    font-weight: bold;
+}
+
+button#loadrom, button#reset, button#savestate, button#about {
+    background-image: image(#3d3737);
+    color: #a484ff;
+    font-weight: bold;
+}
+
+button#loadrom:hover, button#reset:hover, button#savestate:hover, button#about:hover {
+    background-image: image(black);
+}
+

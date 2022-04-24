@@ -1,13 +1,11 @@
 use std::borrow::{Borrow, BorrowMut};
 use gtk4::glib::clone;
 use gtk4::prelude::*;
-use gtk4::{
-    Align, Application, ApplicationWindow, Box, Button, FileChooserAction, FileChooserDialog,
-    GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, TextBuffer, TextView,
-};
+use gtk4::{Align, Application, ApplicationWindow, Box, Button, CssProvider, FileChooserAction, FileChooserDialog, GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, StyleContext, TextBuffer, TextView};
 use bus::Bus;
 use std::{cell::RefCell, rc::Rc};
 use std::ops::{Deref, DerefMut};
+use gtk4::gdk::Display;
 use mos6502::Mos6502;
 use crate::ui::cpu_registers::cpu_register_curr_state;
 
@@ -15,8 +13,22 @@ mod ui;
 use crate::ui::globals::{manes_app, manes_bus, manes_cpu, manes_cpu_regs_textview};
 
 fn main() {
+    manes_app().connect_activate(|_| load_css());
     manes_app().connect_activate(build_ui);
     manes_app().run();
+}
+
+fn load_css() {
+    // Load the CSS file and add it to the provider
+    let provider = CssProvider::new();
+    provider.load_from_data(include_bytes!("style/style.css"));
+
+    // Add the provider to the default screen
+    StyleContext::add_provider_for_display(
+        &Display::default().expect("Could not connect to a display."),
+        &provider,
+        gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
 }
 
 fn build_ui(app: &Application) {
@@ -49,10 +61,10 @@ fn build_ui(app: &Application) {
 }
 
 fn build_top_bar(window: &ApplicationWindow) -> Box {
-    let load_rom_button = Button::with_label("Load ROM");
-    let reset_button = Button::with_label("Reset");
-    let save_state_button = Button::with_label("Save State");
-    let about_button = Button::with_label("About");
+    let load_rom_button = Button::builder().name("loadrom").label("Load ROM").build();
+    let reset_button = Button::builder().name("reset").label("Reset").build();
+    let save_state_button = Button::builder().name("savestate").label("Save State").build();
+    let about_button = Button::builder().name("about").label("About").build();
 
     let menu_bar = Box::builder()
         .hexpand(false)
@@ -136,6 +148,7 @@ fn build_ui_content(_window: &ApplicationWindow) -> Paned {
 
 fn build_left_side_panes() -> Paned {
     let disassembly_textview = TextView::builder()
+        .name("disassemblytextview")
         .editable(true)
         .accepts_tab(false)
         .halign(Align::Fill)
@@ -151,6 +164,7 @@ fn build_left_side_panes() -> Paned {
         .build();
 
     let memory_textview = TextView::builder()
+        .name("memviewtextview")
         .editable(true)
         .accepts_tab(false)
         .halign(Align::Fill)

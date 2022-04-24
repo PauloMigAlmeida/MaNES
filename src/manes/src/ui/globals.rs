@@ -16,6 +16,7 @@ thread_local!(
 
     static MANES_CPU_REGS_TEXTVIEW: Rc<TextView> = Rc::new({
         TextView::builder()
+            .name("cpuregstextview")
             .editable(false)
             .accepts_tab(false)
             .halign(Align::Fill)
