@@ -11,6 +11,7 @@ use ui::globals::{manes_app, manes_bus, manes_cpu};
 use ui::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textview};
 use ui::mem_view::{manes_mem_view_textview};
 use ui::window::{DEFAULT_WINDOW_WIDTH, manes_main_ui};
+use crate::ui::rom_disassembly::manes_rom_disassembly_textview;
 
 fn main() {
     manes_app().connect_activate(|_| load_css());
@@ -141,17 +142,8 @@ fn build_ui_content(_window: &ApplicationWindow) -> Paned {
 }
 
 fn build_left_side_panes() -> Paned {
-    let disassembly_textview = TextView::builder()
-        .name("disassemblytextview")
-        .editable(true)
-        .accepts_tab(false)
-        .halign(Align::Fill)
-        .valign(Align::Fill)
-        .buffer(&TextBuffer::builder().text("ROM Disassembly").build())
-        .build();
-
     let disassembly_scroll = ScrolledWindow::builder()
-        .child(&disassembly_textview)
+        .child(manes_rom_disassembly_textview().as_ref())
         .halign(Align::Fill)
         .valign(Align::Fill)
         .vscrollbar_policy(PolicyType::Always)
