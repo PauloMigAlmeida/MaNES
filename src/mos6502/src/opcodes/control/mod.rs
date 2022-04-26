@@ -24,6 +24,9 @@ mod bit;
 mod tya;
 mod tay;
 mod cpy;
+mod cpx;
+mod iny;
+mod inx;
 use bus::Bus;
 use super::{Mos6502, Instruction};
 pub use cli::*;
@@ -52,6 +55,9 @@ pub use bit::*;
 pub use tya::*;
 pub use tay::*;
 pub use cpy::*;
+pub use cpx::*;
+pub use iny::*;
+pub use inx::*;
 
 //TODO implement actual functions here... right now I'm just interested in the scaffold
 
@@ -105,21 +111,6 @@ pub fn rti(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     value |= cpu.stack_pull(bus) as u16;
     cpu.pc = value;
 
-    0
-}
-
-pub fn iny(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn cpx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn inx(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     0
 }
 
