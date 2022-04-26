@@ -1,4 +1,27 @@
+use gtk4::{TextView, Align, TextBuffer};
+use std::{rc::Rc};
+
 use crate::manes_cpu;
+
+thread_local!(
+    static MANES_CPU_REGS_TEXTVIEW: Rc<TextView> = Rc::new({
+        TextView::builder()
+            .name("cpuregstextview")
+            .editable(false)
+            .accepts_tab(false)
+            .halign(Align::Fill)
+            .valign(Align::Fill)
+            .monospace(true)
+            .focusable(false)
+            .can_target(false)
+            .buffer(&TextBuffer::builder().text(cpu_register_curr_state().as_str()).build())
+            .build()
+    });
+);
+
+pub fn manes_cpu_regs_textview() -> Rc<TextView> {
+    MANES_CPU_REGS_TEXTVIEW.with(|x| x.clone())
+}
 
 pub fn cpu_register_curr_state() -> String {
     let rc_cpu = manes_cpu();

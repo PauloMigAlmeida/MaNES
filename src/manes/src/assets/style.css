@@ -10,13 +10,13 @@ window {
     font-weight: bold;
 }
 
-button#loadrom, button#reset, button#savestate, button#about {
+button#loadrom, button#reset, button#savestate, button#about, button#loadstate {
     background-image: image(#3d3737);
     color: #a484ff;
     font-weight: bold;
 }
 
-button#loadrom:hover, button#reset:hover, button#savestate:hover, button#about:hover {
+button#loadrom:hover, button#reset:hover, button#savestate:hover, button#about:hover, button#loadstate:hover {
     background-image: image(black);
 }
 

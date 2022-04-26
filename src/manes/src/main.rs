@@ -7,8 +7,9 @@ use std::ops::{Deref, DerefMut};
 use gtk4::gdk::Display;
 mod ui;
 
-use ui::globals::{manes_app, manes_bus, manes_cpu, manes_cpu_regs_textview, manes_mem_view_textview};
-use ui::cpu_registers::cpu_register_curr_state;
+use ui::globals::{manes_app, manes_bus, manes_cpu};
+use ui::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textview};
+use ui::mem_view::{manes_mem_view_textview};
 use ui::window::{DEFAULT_WINDOW_WIDTH, manes_main_ui};
 
 fn main() {
@@ -20,7 +21,7 @@ fn main() {
 fn load_css() {
     // Load the CSS file and add it to the provider
     let provider = CssProvider::new();
-    provider.load_from_data(include_bytes!("style/style.css"));
+    provider.load_from_data(include_bytes!("assets/style.css"));
 
     // Add the provider to the default screen
     StyleContext::add_provider_for_display(
@@ -52,6 +53,7 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
     let load_rom_button = Button::builder().name("loadrom").label("Load ROM").build();
     let reset_button = Button::builder().name("reset").label("Reset").build();
     let save_state_button = Button::builder().name("savestate").label("Save State").build();
+    let load_state_button = Button::builder().name("loadstate").label("Load State").build();
     let about_button = Button::builder().name("about").label("About").build();
 
     let menu_bar = Box::builder()
@@ -70,6 +72,7 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
     menu_bar.append(&load_rom_button);
     menu_bar.append(&reset_button);
     menu_bar.append(&save_state_button);
+    menu_bar.append(&load_state_button);
     menu_bar.append(&about_button);
 
     load_rom_button.connect_clicked(clone!(@strong window =>

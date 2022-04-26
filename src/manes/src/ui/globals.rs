@@ -1,9 +1,7 @@
-use gtk4::{Application, TextView, Align, TextBuffer};
+use gtk4::Application;
 use std::{cell::RefCell, rc::Rc};
 use mos6502::Mos6502;
 use bus::Bus;
-use crate::ui::cpu_registers::*;
-use crate::ui::mem_view::*;
 
 thread_local!(
     static MANES_APPLICATION: Rc<Application> = Rc::new({
@@ -11,34 +9,6 @@ thread_local!(
         println!("Setting up application with id '{}'", application_id);
         Application::builder()
             .application_id(application_id)
-            .build()
-    });
-
-    static MANES_CPU_REGS_TEXTVIEW: Rc<TextView> = Rc::new({
-        TextView::builder()
-            .name("cpuregstextview")
-            .editable(false)
-            .accepts_tab(false)
-            .halign(Align::Fill)
-            .valign(Align::Fill)
-            .monospace(true)
-            .focusable(false)
-            .can_target(false)
-            .buffer(&TextBuffer::builder().text(cpu_register_curr_state().as_str()).build())
-            .build()
-    });
-
-    static MANES_MEM_VIEW_TEXTVIEW: Rc<TextView> = Rc::new({
-        TextView::builder()
-            .name("memviewtextview")
-            .editable(false)
-            .accepts_tab(false)
-            .halign(Align::Fill)
-            .valign(Align::Fill)
-            .monospace(true)
-            .focusable(false)
-            .can_target(false)
-            .buffer(&TextBuffer::builder().text(mem_view_curr_state().as_str()).build())
             .build()
     });
 
@@ -54,14 +24,6 @@ thread_local!(
 
 pub fn manes_app() -> Rc<Application> {
     MANES_APPLICATION.with(|x| x.clone())
-}
-
-pub fn manes_cpu_regs_textview() -> Rc<TextView> {
-    MANES_CPU_REGS_TEXTVIEW.with(|x| x.clone())
-}
-
-pub fn manes_mem_view_textview() -> Rc<TextView> {
-    MANES_MEM_VIEW_TEXTVIEW.with(|x| x.clone())
 }
 
 pub fn manes_cpu() -> Rc<RefCell<Mos6502>> {
