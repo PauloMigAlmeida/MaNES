@@ -88,6 +88,7 @@ impl Mos6502 {
 
         let fetched= match inst.mode {
             Immediate | Relative => bus.read_u8(self.pc + 1),
+            Accumulator => self.a,
             ZeroPage => {
                 let addr = bus.read_u8(self.pc + 1);
                 bus.read_u8(addr as u16)
