@@ -10,8 +10,8 @@ mod dex;
 mod dec;
 mod asl;
 mod lsr;
-use bus::Bus;
-use super::{Mos6502, Instruction};
+mod rol;
+mod ror;
 pub use stx::*;
 pub use nop::*;
 pub use ldx::*;
@@ -24,16 +24,5 @@ pub use dex::*;
 pub use dec::*;
 pub use asl::*;
 pub use lsr::*;
-
-//TODO implement actual functions here... right now I'm just interested in the scaffold
-
-pub fn rol(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
-pub fn ror(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
-    println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    0
-}
-
+pub use rol::*;
+pub use ror::*;

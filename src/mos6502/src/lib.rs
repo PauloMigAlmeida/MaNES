@@ -1,3 +1,5 @@
+extern crate core;
+
 mod opcodes;
 
 use bus::Bus;

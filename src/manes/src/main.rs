@@ -1,9 +1,6 @@
-use std::borrow::{Borrow, BorrowMut};
 use gtk4::glib::clone;
 use gtk4::prelude::*;
-use gtk4::{Align, Application, ApplicationWindow, Box, Button, CssProvider, FileChooserAction, FileChooserDialog, GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, StyleContext, TextBuffer, TextView};
-use std::{cell::RefCell, rc::Rc};
-use std::ops::{Deref, DerefMut};
+use gtk4::{Align, Application, ApplicationWindow, Box, Button, CssProvider, FileChooserAction, FileChooserDialog, GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, StyleContext, TextBuffer};
 use gtk4::gdk::Display;
 mod ui;
 

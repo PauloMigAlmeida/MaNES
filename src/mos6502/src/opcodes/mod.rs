@@ -47,6 +47,8 @@ pub enum Flags {
     Zero = 1,
     Interrupt = 2,
     Decimal = 3,
+    Break = 4,
+    Unused = 5,
     Overflow = 6,
     Negative = 7,
 }
@@ -86,7 +88,7 @@ pub const OPTABLE: [Instruction;256] = [
     Instruction { opcode: 0x1e, name: "ASL", mode: AbsoluteX,   bytes: 3, cycles: 7, function: asl },
     Instruction { opcode: 0x1f, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
 
-    Instruction { opcode: 0x20, name: "JSR", mode: Relative,    bytes: 2, cycles: 2, function: jsr },
+    Instruction { opcode: 0x20, name: "JSR", mode: Absolute,    bytes: 3, cycles: 6, function: jsr },
     Instruction { opcode: 0x21, name: "AND", mode: IndirectX,   bytes: 2, cycles: 6, function: and },
     Instruction { opcode: 0x22, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
     Instruction { opcode: 0x23, name: "IVL", mode: Invalid,     bytes: 0, cycles: 0, function: invalid },
