@@ -337,8 +337,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_brk() {
+    fn test_parse_instruction() {
         let result = parse_instruction(0x0);
-        assert_eq!(result.name, "BRK");        
+        assert_eq!(result.name, "BRK");
+        let result = parse_instruction(0x3);
+        assert_eq!(result.name, "IVL");
     }
 }

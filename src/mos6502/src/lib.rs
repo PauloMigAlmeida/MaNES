@@ -14,6 +14,7 @@ pub struct Mos6502 {
     pub pc: u16,
     pub sp: u8,
     pub flags: u8,
+    pub cycles: u8,
 }
 
 impl Mos6502 {
@@ -27,7 +28,26 @@ impl Mos6502 {
             /* offset for the 0x0100 page */
             sp: 0xFD,
             flags: 0x34,
+            /*  counts how many cycles the instruction has remaining */
+            cycles: 0,
         }
+    }
+
+    pub fn reset(&mut self, bus: & Bus) {
+        // Get address to set program counter to
+        self.pc = bus.read_u16(0xFFFC);
+
+        // reset regs
+        self.a = 0;
+        self.x = 0;
+        self.y = 0;
+        self.sp = 0xFD;
+
+        self.flags = 0x0;
+        self.set_flag(Flags::Unused);
+
+        // Reset takes time
+        self.cycles = 8;
     }
 
     pub fn execute_instruction(&mut self, opcode: u8, bus: &mut Bus) -> u8 {
@@ -253,5 +273,26 @@ mod tests {
 
         cpu.sp = 0xff;
         cpu.stack_pull(&bus);
+    }
+
+    #[test]
+    fn test_cpu_reset() {
+        let mut cpu = Mos6502::new();
+        let mut bus = Bus::new();
+
+        bus.write_u16(0xFFFC, 0x1234);
+        cpu.a = 0x1;
+        cpu.x = 0x1;
+        cpu.y = 0x1;
+        cpu.sp = 0xC0;
+        cpu.flags = 0xFF;
+
+        cpu.reset(&bus);
+        assert_eq!(cpu.a, 0);
+        assert_eq!(cpu.x, 0);
+        assert_eq!(cpu.y, 0);
+        assert_eq!(cpu.sp, 0xFD);
+        assert_eq!(cpu.flags, 0b0010_0000);
+        assert_eq!(cpu.cycles, 8);
     }
 }
