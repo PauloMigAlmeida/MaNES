@@ -34,7 +34,7 @@ pub fn rom_disassembly_curr_state() -> String {
     let mut content = String::new();
     content.push_str("[ROM Disassembly]\n\n");
 
-    let rom_mem = bus.read_u8_slice(0, 0xffff);
-    content.push_str(disassemble_program(rom_mem, 0x0, true).as_str());
+    let rom_mem = bus.read_u8_slice(0x8000, 0xffff);
+    content.push_str(disassemble_program(rom_mem, 0x8000, true).as_str());
     content
 }

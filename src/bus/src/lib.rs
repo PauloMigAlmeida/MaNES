@@ -6,6 +6,7 @@
 //     - implement logic to write/read data to/from the right component in the bus
 
 const RAM_SIZE: u16 = 0xFFFF;
+const MAX_ROM_SIZE: usize = 0xFFFF - 0x8000;
 
 pub struct Bus {
     ram: [u8; RAM_SIZE as usize + 1],
@@ -44,7 +45,13 @@ impl Bus {
     }
 
     pub fn load_to_ram(&mut self, start: u16, content: &[u8]) {
-        let start = start as usize;
-        self.ram[start..(start + content.len())].copy_from_slice(content);
+        // sanity checks
+        let rom_size: usize = if content.len() > MAX_ROM_SIZE { MAX_ROM_SIZE } else { content.len() };
+
+        let mut j = start as usize;
+        for i in 0..rom_size {
+            self.ram[j] = content[i];
+            j += 1;
+        }
     }
 }
