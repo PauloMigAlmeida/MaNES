@@ -46,10 +46,10 @@ pub fn mem_view_curr_state() -> String {
         let v_13 = bus.read_u8(i + 13);
         let v_14 = bus.read_u8(i + 14);
         let v_15 = bus.read_u8(i + 15);
-        content.push_str(format!("{:04X}: {:02X}{:02X}{:02X}{:02X}\
-                                                 {:02X}{:02X}{:02X}{:02X}\
-                                                 {:02X}{:02X}{:02X}{:02X}\
-                                                 {:02X}{:02X}{:02X}{:02X}\
+        content.push_str(format!("{:04X}: {:02X} {:02X} {:02X} {:02X} \
+                                                 {:02X} {:02X} {:02X} {:02X} \
+                                                 {:02X} {:02X} {:02X} {:02X} \
+                                                 {:02X} {:02X} {:02X} {:02X} \
                                                  \t\
                                                  {}{}{}{}\
                                                  {}{}{}{}\

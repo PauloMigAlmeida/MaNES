@@ -52,27 +52,4 @@ mod tests {
         assert_eq!(cpu.sp, 0xff);
     }
 
-    // #[test]
-    // fn test_rti() {
-    //     let (mut cpu, mut bus) = init();
-    //
-    //     cpu.sp = 0xff;
-    //     cpu.flags = 0b1100_1110;
-    //     cpu.pc = 0x0203;
-    //
-    //     cpu.stack_push((cpu.pc & 0xff) as u8, &mut bus); // LSB
-    //     cpu.stack_push(((cpu.pc & 0xff00) >> 8) as u8, &mut bus); //MSB
-    //     cpu.stack_push(cpu.flags, &mut bus);
-    //
-    //     cpu.flags = 0;
-    //     cpu.pc = 0;
-    //
-    //     let opcode = OPTABLE[0x40];
-    //     let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
-    //     assert_eq!(cycles, opcode.cycles);
-    //     assert_eq!(cpu.flags, 0b1100_1110);
-    //     assert_eq!(cpu.pc, 0x0203);
-    //     assert_eq!(cpu.sp, 0xff);
-    // }
-
 }

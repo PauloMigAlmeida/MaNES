@@ -1,11 +1,9 @@
-extern crate core;
-
 mod opcodes;
 
 use bus::Bus;
 use opcodes::{parse_instruction, Flags};
-use crate::opcodes::{AddressingMode::*, Instruction};
-
+pub use crate::opcodes::{AddressingMode::*, Instruction};
+pub use crate::opcodes::OPTABLE;
 const STACK_PAGE:u16 = 0x0100;
 
 #[derive(Debug)]
@@ -180,24 +178,28 @@ mod tests {
         assert_eq!(cpu.flags, 0b0000_0111);
         cpu.set_flag(Flags::Decimal);
         assert_eq!(cpu.flags, 0b0000_1111);
+        cpu.set_flag(Flags::Break);
+        assert_eq!(cpu.flags, 0b0001_1111);
         cpu.set_flag(Flags::Overflow);
-        assert_eq!(cpu.flags, 0b0100_1111);
+        assert_eq!(cpu.flags, 0b0101_1111);
         cpu.set_flag(Flags::Negative);
-        assert_eq!(cpu.flags, 0b1100_1111);
+        assert_eq!(cpu.flags, 0b1101_1111);
     }
 
     #[test]
     fn test_clear_flag() {
         let mut cpu = Mos6502::new();
-        cpu.flags = 0b1100_1111;
+        cpu.flags = 0b1101_1111;
 
         cpu.clear_flag(Flags::Carry);
-        assert_eq!(cpu.flags, 0b1100_1110);
+        assert_eq!(cpu.flags, 0b1101_1110);
         cpu.clear_flag(Flags::Zero);
-        assert_eq!(cpu.flags, 0b1100_1100);
+        assert_eq!(cpu.flags, 0b1101_1100);
         cpu.clear_flag(Flags::Interrupt);
-        assert_eq!(cpu.flags, 0b1100_1000);
+        assert_eq!(cpu.flags, 0b1101_1000);
         cpu.clear_flag(Flags::Decimal);
+        assert_eq!(cpu.flags, 0b1101_0000);
+        cpu.clear_flag(Flags::Break);
         assert_eq!(cpu.flags, 0b1100_0000);
         cpu.clear_flag(Flags::Overflow);
         assert_eq!(cpu.flags, 0b1000_0000);

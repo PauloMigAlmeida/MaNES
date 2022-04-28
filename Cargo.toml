@@ -1,5 +1,5 @@
 [workspace]
-members = ["src/manes"]
+members = ["src/manes", "src/bus", "src/mos6502", "src/mos6502-disassembler"]
 default-members = ["src/manes"]
 
 [profile.dev]

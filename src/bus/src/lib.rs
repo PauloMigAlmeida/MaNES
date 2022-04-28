@@ -22,6 +22,10 @@ impl Bus {
         self.ram[addr as usize]
     }
 
+    pub fn read_u8_slice(&self, from: u16, to: u16) -> &[u8] {
+        &self.ram[(from as usize)..(to as usize)]
+    }
+
     pub fn read_u16(&self, addr: u16) -> u16 {
         let low = self.read_u8(addr);
         let high = self.read_u8(addr + 1);
@@ -37,5 +41,10 @@ impl Bus {
         let high = ((value >> 8) & 0xff) as u8;
         self.ram[addr as usize] = low;
         self.ram[(addr + 1) as usize] = high;
+    }
+
+    pub fn load_to_ram(&mut self, start: u16, content: &[u8]) {
+        let start = start as usize;
+        self.ram[start..(start + content.len())].copy_from_slice(content);
     }
 }

@@ -1,14 +1,19 @@
+use gtk4::gdk::Display;
 use gtk4::glib::clone;
 use gtk4::prelude::*;
-use gtk4::{Align, Application, ApplicationWindow, Box, Button, CssProvider, FileChooserAction, FileChooserDialog, GLArea, Orientation, Paned, PolicyType, ResponseType, ScrolledWindow, StyleContext, TextBuffer};
-use gtk4::gdk::Display;
+use gtk4::{
+    Align, Application, ApplicationWindow, Box, Button, CssProvider,
+    GLArea, Orientation, Paned, PolicyType, ScrolledWindow,
+    StyleContext, TextBuffer,
+};
 mod ui;
 
+use ui::textview::rom_disassembly::manes_rom_disassembly_textview;
+use ui::textview::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textview};
+use ui::textview::mem_view::manes_mem_view_textview;
+use ui::button::load_rom::{manes_load_rom_button, load_rom_button_events_setup};
 use ui::globals::{manes_app, manes_bus, manes_cpu};
-use ui::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textview};
-use ui::mem_view::{manes_mem_view_textview};
-use ui::window::{DEFAULT_WINDOW_WIDTH, manes_main_ui};
-use crate::ui::rom_disassembly::manes_rom_disassembly_textview;
+use ui::window::{manes_main_ui, DEFAULT_WINDOW_WIDTH};
 
 fn main() {
     manes_app().connect_activate(|_| load_css());
@@ -48,10 +53,15 @@ fn build_ui(_app: &Application) {
 }
 
 fn build_top_bar(window: &ApplicationWindow) -> Box {
-    let load_rom_button = Button::builder().name("loadrom").label("Load ROM").build();
     let reset_button = Button::builder().name("reset").label("Reset").build();
-    let save_state_button = Button::builder().name("savestate").label("Save State").build();
-    let load_state_button = Button::builder().name("loadstate").label("Load State").build();
+    let save_state_button = Button::builder()
+        .name("savestate")
+        .label("Save State")
+        .build();
+    let load_state_button = Button::builder()
+        .name("loadstate")
+        .label("Load State")
+        .build();
     let about_button = Button::builder().name("about").label("About").build();
 
     let menu_bar = Box::builder()
@@ -67,34 +77,13 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
         .orientation(Orientation::Horizontal)
         .build();
 
-    menu_bar.append(&load_rom_button);
+    menu_bar.append(manes_load_rom_button().as_ref());
     menu_bar.append(&reset_button);
     menu_bar.append(&save_state_button);
     menu_bar.append(&load_state_button);
     menu_bar.append(&about_button);
 
-    load_rom_button.connect_clicked(clone!(@strong window =>
-        move |_| {
-            let f = FileChooserDialog::new(
-                Some("Load ROM"),
-                Some(&window),
-                FileChooserAction::Open,
-                &[("OK", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]
-            );
-            f.set_modal(true);
-            f.show();
-
-            f.connect_response( | dialog, resp| {
-                match resp {
-                    ResponseType::Ok => println!("Chose OK"),
-                    ResponseType::Cancel => println!("Chose Cancel"),
-                    _ => println!("Chose close"),
-                }
-                dialog.close();
-            });
-        }
-    ));
-
+    load_rom_button_events_setup(&window);
 
     reset_button.connect_clicked(clone!(@strong window =>
         move |_| {
@@ -171,7 +160,6 @@ fn build_right_side_panes() -> Paned {
         .halign(Align::Fill)
         .valign(Align::Fill)
         .build();
-
 
     Paned::builder()
         .orientation(Orientation::Vertical)
