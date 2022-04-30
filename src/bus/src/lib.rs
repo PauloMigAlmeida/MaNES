@@ -56,3 +56,19 @@ impl Bus {
         }
     }
 }
+
+#[cfg(test)]
+mod test{
+    use super::*;
+
+    #[test]
+    fn test_memory_is_zeroed() {
+        let bus = Bus::new();
+        let mut content = 0;
+        for i in bus.ram {
+            content += i;
+        }
+        assert_eq!(content, 0);
+    }
+
+}
