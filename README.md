@@ -14,15 +14,15 @@ He is pretty old now (83ish) and I would like to show him the "Mane Nintendo Ent
 To make sure I won't lose focus on what I want this emulator to be able to do, I decided to write a list of features
 that I want to implement in the short to medium term.
 
-- [ ] Emulate legal opcodes for the 6502
-- [ ] Create a ROM Disassembler (somewhat similar to what objdump does)
+- [X] Emulate legal opcodes for the 6502
+- [X] Create a ROM Disassembler (somewhat similar to what objdump does)
 - [ ] Create simplified GUI that contains the framebuffer and a RAM view
 - [ ] Implement 1 Mapper (the simplest one) 
 - [ ] Write all above in Rust (that's the secondary goal for this winter project)
 
 
 ## Stretch goals
-Things that would be fantastic to have but I am not sure I want to spend all that time
+Things that would be fantastic to have but I am not sure that I want to spend all that time
 
 - [ ] Implement most commons Mappers
 - [ ] Audio emulation
