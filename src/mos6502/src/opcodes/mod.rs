@@ -45,7 +45,7 @@ pub enum AddressingMode {
 pub enum Flags {
     Carry = 0,
     Zero = 1,
-    Interrupt = 2,
+    DisableInterrupt = 2,
     Decimal = 3,
     Break = 4,
     Unused = 5,

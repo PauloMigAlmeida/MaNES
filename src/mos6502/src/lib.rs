@@ -194,7 +194,7 @@ mod tests {
         assert_eq!(cpu.flags, 0b0000_0001);
         cpu.set_flag(Flags::Zero);
         assert_eq!(cpu.flags, 0b0000_0011);
-        cpu.set_flag(Flags::Interrupt);
+        cpu.set_flag(Flags::DisableInterrupt);
         assert_eq!(cpu.flags, 0b0000_0111);
         cpu.set_flag(Flags::Decimal);
         assert_eq!(cpu.flags, 0b0000_1111);
@@ -215,7 +215,7 @@ mod tests {
         assert_eq!(cpu.flags, 0b1101_1110);
         cpu.clear_flag(Flags::Zero);
         assert_eq!(cpu.flags, 0b1101_1100);
-        cpu.clear_flag(Flags::Interrupt);
+        cpu.clear_flag(Flags::DisableInterrupt);
         assert_eq!(cpu.flags, 0b1101_1000);
         cpu.clear_flag(Flags::Decimal);
         assert_eq!(cpu.flags, 0b1101_0000);

@@ -1,6 +1,6 @@
 use bus::Bus;
 use crate::{Mos6502, Instruction};
-use crate::Flags::{Break, Interrupt};
+use crate::Flags::{Break, DisableInterrupt};
 
 /// RTI - Return from Interrupt
 ///
@@ -11,7 +11,7 @@ pub fn rti(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     cpu.flags = cpu.stack_pull(bus);
     cpu.pc = cpu.stack_pull(bus) as u16 | (cpu.stack_pull(bus) as u16) << 8;
     cpu.clear_flag(Break);
-    cpu.clear_flag(Interrupt);
+    cpu.clear_flag(DisableInterrupt);
     0
 }
 

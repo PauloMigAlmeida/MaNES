@@ -5,7 +5,7 @@ use crate::{Mos6502, Instruction, Flags::*};
 /// Set the interrupt disable flag to one.
 pub fn sei(cpu: &mut Mos6502, inst: Instruction, _bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
-    cpu.set_flag(Interrupt);
+    cpu.set_flag(DisableInterrupt);
     cpu.pc += inst.bytes as u16;
     0
 }

@@ -6,7 +6,8 @@
 //     - implement logic to write/read data to/from the right component in the bus
 
 const RAM_SIZE: u16 = 0xFFFF;
-const MAX_ROM_SIZE: usize = 0xFFFF - 0x8000;
+const MAX_ROM_SIZE: usize = (RAM_SIZE - ROM_START_ADDR) as usize;
+pub const ROM_START_ADDR: u16 = 0x8000;
 
 pub struct Bus {
     ram: [u8; RAM_SIZE as usize + 1],

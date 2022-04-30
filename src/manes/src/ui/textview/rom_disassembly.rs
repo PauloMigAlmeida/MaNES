@@ -2,6 +2,7 @@ use crate::manes_bus;
 use gtk4::{Align, TextBuffer, TextView};
 use mos6502_disassembler::disassemble_program;
 use std::rc::Rc;
+use bus::ROM_START_ADDR;
 
 thread_local!(
     static MANES_ROM_DISASSEMBLY_TEXTVIEW: Rc<TextView> = Rc::new({
@@ -34,7 +35,7 @@ pub fn rom_disassembly_curr_state() -> String {
     let mut content = String::new();
     content.push_str("[ROM Disassembly]\n\n");
 
-    let rom_mem = bus.read_u8_slice(0x8000, 0xffff);
-    content.push_str(disassemble_program(rom_mem, 0x8000, true).as_str());
+    let rom_mem = bus.read_u8_slice(ROM_START_ADDR, 0xffff);
+    content.push_str(disassemble_program(rom_mem, ROM_START_ADDR, true).as_str());
     content
 }

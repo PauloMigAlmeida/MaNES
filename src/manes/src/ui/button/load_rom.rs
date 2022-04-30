@@ -6,6 +6,7 @@ use gtk4::gio::Cancellable;
 use crate::{manes_bus};
 use crate::ui::textview::rom_disassembly::{rom_disassembly_curr_state,manes_rom_disassembly_textview};
 use crate::ui::textview::mem_view::{mem_view_curr_state, manes_mem_view_textview};
+use bus::ROM_START_ADDR;
 
 thread_local!(
     static MANES_LOAD_ROM_BUTTON: Rc<Button> =
@@ -39,7 +40,7 @@ pub fn load_rom_button_events_setup(window: &ApplicationWindow) {
                             let (vec_bytes, _) = file.load_contents(Cancellable::NONE).expect("test");
 
                             println!("Loading to ram");
-                            manes_bus().as_ref().borrow_mut().load_to_ram(0x8000, vec_bytes.as_slice());
+                            manes_bus().as_ref().borrow_mut().load_to_ram(ROM_START_ADDR, vec_bytes.as_slice());
 
                             println!("Disassembling");
                             manes_rom_disassembly_textview()

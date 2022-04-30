@@ -11,7 +11,7 @@ pub fn brk(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     println!("{} -> {:?} was called with cpu: {:?}", inst.name, inst.mode, cpu);
     cpu.pc += inst.bytes as u16;
 
-    cpu.set_flag(Interrupt);
+    cpu.set_flag(DisableInterrupt);
     cpu.stack_push((cpu.pc >> 8) as u8, bus);
     cpu.stack_push((cpu.pc & 0x00FF) as u8, bus);
     cpu.set_flag(Break);
