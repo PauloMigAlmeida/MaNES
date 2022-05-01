@@ -23,11 +23,34 @@ jobs:
       run: cargo clean && mkdir output
     - name: Build
       run: cargo test --workspace --exclude "manes" --no-run --verbose
-    - name: Coverage (Bus)
+    - name: Coverage (Mos6502)
       run: |
             for i in `ls target/debug/deps/mos6502-*`; do
               if grep -qi elf $i ; then
                 echo "found $i" 
-                kcov --exclude-path=/usr/lib,/.cargo,/usr/include/ --verify output/ $i
+                kcov \
+                  --exclude-path=/usr/lib,/.cargo,/usr/include/,/MaNES/src/bus,/MaNES/src/mos6502-disassembler \
+                  --verify output/ $i
+              fi
+            done
+    - name: Coverage (Bus)
+      run: |
+            for i in `ls target/debug/deps/bus-*`; do
+              if grep -qi elf $i ; then
+                echo "found $i" 
+                kcov \
+                  --exclude-path=/usr/lib,/.cargo,/usr/include/,/MaNES/src/mos6502,/MaNES/src/mos6502-disassembler \
+                  --verify output/ $i
+              fi
+            done
+    
+    - name: Coverage (Mos6502 Disassembler)
+      run: |
+            for i in `ls target/debug/deps/mos6502_disassembler-*`; do
+              if grep -qi elf $i ; then
+                echo "found $i" 
+                kcov \
+                  --exclude-path=/usr/lib,/.cargo,/usr/include/,/MaNES/src/mos6502,/MaNES/src/bus \
+                  --verify output/ $i
               fi
             done
