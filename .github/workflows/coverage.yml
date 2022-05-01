@@ -50,7 +50,10 @@ jobs:
               if grep -qi elf $i ; then
                 echo "found $i" 
                 kcov \
+                  --coveralls-id=${COVERALLS_REPO_KEY} \
                   --exclude-path=/usr/lib,/.cargo,/usr/include/,/MaNES/src/mos6502,/MaNES/src/bus \
                   --verify output/ $i
               fi
             done
+      env:
+        COVERALLS_REPO_KEY: ${{ secrets.COVERALLS_REPO_KEY }}
