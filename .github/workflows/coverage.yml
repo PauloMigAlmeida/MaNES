@@ -18,9 +18,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install dependencies
-      run: sudo apt-get install kcov
+      run: sudo apt-get install -y kcov
     - name: Filesystem prep
       run: cargo clean && mkdir output
     - name: Build
       run: cargo test --workspace --exclude "manes" --no-run --verbose
-
+    - name: Coverage (Bus)
+      run: |
+            for i in `ls target/debug/deps/mos6502-*`; do
+              if grep -qi elf $i ; then
+                echo "found $i" 
+                kcov --exclude-path=/usr/lib,/.cargo,/usr/include/ --verify output/ $i
+              fi
+            done
