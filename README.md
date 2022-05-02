@@ -1,5 +1,4 @@
 # MaNES
-[![Coverage Status](https://coveralls.io/repos/github/PauloMigAlmeida/MaNES/badge.svg?branch=main)](https://coveralls.io/github/PauloMigAlmeida/MaNES?branch=main)
 
 MaNES is an experimental NES emulator written from scratch in Rust. This is work in progress and I would expect something to have it "finalised" by the end of 2022.
 
