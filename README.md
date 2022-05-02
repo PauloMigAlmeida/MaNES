@@ -1,4 +1,5 @@
 # MaNES
+[![codecov](https://codecov.io/gh/PauloMigAlmeida/MaNES/branch/main/graph/badge.svg?token=H5WFJT5FG7)](https://codecov.io/gh/PauloMigAlmeida/MaNES)
 
 MaNES is an experimental NES emulator written from scratch in Rust. This is work in progress and I would expect something to have it "finalised" by the end of 2022.
 
