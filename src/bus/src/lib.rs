@@ -71,4 +71,12 @@ mod test{
         assert_eq!(content, 0);
     }
 
+    #[test]
+    fn test_load_memory() {
+        let mut bus = Bus::new();
+        let arr:[u8;5] = [1,2,3,4,5];
+        bus.load_to_ram(0x8000, &arr);
+        assert_eq!(&bus.ram[0x8000..0x8005], &arr);
+    }
+
 }
