@@ -21,5 +21,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run code coverage
-      run:  cargo tarpaulin --workspace -v --exclude "manes"
+      run:  cargo tarpaulin --workspace -v --exclude "manes" --out Xml
+    - name: Upload to codecov.io
+      uses: codecov/codecov-action@v2
+      with:
+        fail_ci_if_error: true
 
