@@ -40,7 +40,8 @@ pub fn load_rom_button_events_setup(window: &ApplicationWindow) {
                             let (vec_bytes, _) = file.load_contents(Cancellable::NONE).expect("test");
 
                             println!("Loading to ram");
-                            manes_bus().as_ref().borrow_mut().load_to_ram(ROM_START_ADDR, vec_bytes.as_slice());
+                                //TODO uncomment when you finish implementing cartridge
+                            // manes_bus().as_ref().borrow_mut().load_to_ram(ROM_START_ADDR, vec_bytes.as_slice());
 
                             println!("Disassembling");
                             manes_rom_disassembly_textview()

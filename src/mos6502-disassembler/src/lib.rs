@@ -1,4 +1,4 @@
-use mos6502::*;
+use bus::mos6502::*;
 
 pub fn disassemble_program(machine_code: &[u8], base_address: u16, verbose: bool) -> String {
     if machine_code.is_empty() {
@@ -69,41 +69,41 @@ fn parse_arguments(
     content: &mut String,
 ) {
     match instruction.mode {
-        Implicit => (),
-        Accumulator => {
+        AddressingMode::Implicit => (),
+        AddressingMode::Accumulator => {
             content.push_str("A");
         }
-        Immediate => {
+        AddressingMode::Immediate => {
             content.push_str(format!("#${:02X}", parse_u8(machine_code, pos)).as_str());
         }
-        ZeroPage => {
+        AddressingMode::ZeroPage => {
             content.push_str(format!("${:02X}", parse_u8(machine_code, pos)).as_str());
         }
-        ZeroPageX => {
+        AddressingMode::ZeroPageX => {
             content.push_str(format!("${:02X},x", parse_u8(machine_code, pos)).as_str());
         }
-        ZeroPageY => {
+        AddressingMode::ZeroPageY => {
             content.push_str(format!("${:02X},y", parse_u8(machine_code, pos)).as_str());
         }
-        Absolute => {
+        AddressingMode::Absolute => {
             content.push_str(format!("${:04X}", parse_u16(machine_code, pos)).as_str());
         }
-        AbsoluteX => {
+        AddressingMode::AbsoluteX => {
             content.push_str(format!("${:04X},x", parse_u16(machine_code, pos)).as_str());
         }
-        AbsoluteY => {
+        AddressingMode::AbsoluteY => {
             content.push_str(format!("${:04X},y", parse_u16(machine_code, pos)).as_str());
         }
-        Indirect => {
+        AddressingMode::Indirect => {
             content.push_str(format!("(${:04X})", parse_u16(machine_code, pos)).as_str());
         }
-        IndirectX => {
+        AddressingMode::IndirectX => {
             content.push_str(format!("(${:02X},x)", parse_u8(machine_code, pos)).as_str());
         }
-        IndirectY => {
+        AddressingMode::IndirectY => {
             content.push_str(format!("(${:02X},x)", parse_u8(machine_code, pos)).as_str());
         }
-        Relative => {
+        AddressingMode::Relative => {
             // yeah yeah, I could do the bitwise dance but being able to emulate low-bit hardware
             // is that it allows you to be a bit sloppy without hurting performance too much...
             // It's a bit more readable this way..

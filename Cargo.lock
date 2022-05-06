@@ -23,6 +23,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 [[package]]
 name = "bus"
 version = "0.1.0"
+dependencies = [
+ "cartridge",
+]
 
 [[package]]
 name = "cairo-rs"
@@ -47,6 +50,10 @@ dependencies = [
  "libc",
  "system-deps",
 ]
+
+[[package]]
+name = "cartridge"
+version = "0.1.0"
 
 [[package]]
 name = "cfg-expr"
@@ -393,7 +400,6 @@ version = "0.1.0"
 dependencies = [
  "bus",
  "gtk4",
- "mos6502",
  "mos6502-disassembler",
 ]
 
@@ -413,18 +419,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "mos6502"
-version = "0.1.0"
-dependencies = [
- "bus",
-]
-
-[[package]]
 name = "mos6502-disassembler"
 version = "0.1.0"
 dependencies = [
  "bus",
- "mos6502",
 ]
 
 [[package]]
