@@ -24,7 +24,10 @@ impl Bus {
     }
 
     pub fn read_u8(&self, addr: u16) -> u8 {
-        self.ram[addr as usize]
+        if addr <= 0x1FFF {
+            return self.ram[(addr & 0x07FF) as usize]
+        }
+        panic!("invalid memory address requested... aborting")
     }
 
     pub fn read_u8_slice(&self, from: u16, to: u16) -> &[u8] {
@@ -41,7 +44,11 @@ impl Bus {
     }
 
     pub fn write_u8(&mut self, addr: u16, value: u8) {
-        self.ram[(addr & 0x07FF) as usize] = value;
+        if addr <= 0x1FFF {
+            self.ram[(addr & 0x07FF) as usize] = value;
+        } else {
+            panic!("invalid memory address requested... aborting")
+        }
     }
 
     pub fn write_u16(&mut self, addr: u16, value: u16) {
