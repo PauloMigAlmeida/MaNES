@@ -5,6 +5,7 @@
 //
 //     - implement logic to write/read data to/from the right component in the bus
 pub mod mos6502;
+mod cartridge;
 
 const RAM_SIZE: u16 = 0x0800; // CPU has a whopping 2KB RAM
 // const MAX_ROM_SIZE: usize = (RAM_SIZE - ROM_START_ADDR) as usize;

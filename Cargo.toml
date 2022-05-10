@@ -3,7 +3,6 @@ members = [
     "src/manes",
     "src/bus",
     "src/mos6502-disassembler",
-    "src/cartridge",
 ]
 default-members = ["src/manes"]
 
