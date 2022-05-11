@@ -43,6 +43,7 @@ impl INESFormat {
         pos += 16;
 
         if rom.header.flags_6 & 0x4 == 0x4 {
+            rom.trainer.resize(512,0);
             rom.trainer.copy_from_slice(&bytes[pos..(pos + 512)]);
             pos += 512;
         }
@@ -127,7 +128,7 @@ mod tests {
 
         assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 25104);
         assert_eq!(rom.header.magic_const, [0x4E, 0x45, 0x53, 0x1A]);
-        assert_eq!(rom.header.flags_6, 0);
+        assert_eq!(rom.header.flags_6, 0x4);
         assert_eq!(rom.trainer.len(), 512);
 
         assert_eq!(rom.prg_rom.len(), 1 * PRG_ROM_SIZE_FACTOR);
