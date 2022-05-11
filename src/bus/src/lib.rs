@@ -1,3 +1,5 @@
+extern crate core;
+
 // Notes to myself:
 //     - Implement some sort of subscribe mechanism that allow components to register their
 //         ranges so we can iterate through the list to find out which of them read/write op is

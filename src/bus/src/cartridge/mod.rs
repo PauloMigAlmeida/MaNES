@@ -4,6 +4,9 @@ use crate::cartridge::header::Header;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
+const PRG_ROM_SIZE_FACTOR:usize = 16384;
+const CHR_ROM_SIZE_FACTOR:usize = 8192;
+
 pub struct INESFormat {
     // Header (16 bytes)
     header: Header,
@@ -44,12 +47,12 @@ impl INESFormat {
             pos += 512;
         }
 
-        rom.prg_rom
-            .copy_from_slice(&bytes[pos..(pos + rom.header.prg_rom_size as usize * 16384)]);
+        rom.prg_rom.resize(rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR, 0);
+        rom.prg_rom.copy_from_slice(&bytes[pos..(pos + rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR)]);
         pos += rom.prg_rom.len();
 
-        rom.chr_rom
-            .copy_from_slice(&bytes[pos..(pos + rom.header.chr_rom_size as usize * 8192)]);
+        rom.chr_rom.resize(rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR, 0);
+        rom.chr_rom.copy_from_slice(&bytes[pos..(pos + rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR)]);
 
         rom
     }
@@ -62,4 +65,76 @@ impl INESFormat {
             .expect("failed to read the file");
         Ok(bytes)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::{Write};
+    use std::os::unix::prelude::*;
+    use tempfile::{NamedTempFile, tempfile};
+    use filename::file_name;
+    use super::*;
+
+    fn generate_file(add_trainer: bool) -> (NamedTempFile, String) {
+        let mut tmp_file = NamedTempFile::new().unwrap();
+
+        // header
+        let mut contents:Vec<u8> = vec![0x4E, 0x45, 0x53, 0x1A, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        if add_trainer {
+            contents[6] |= 0x4;
+            contents.resize(contents.len() + 512, 0xFF);
+        }
+
+        //  prg_rom
+        contents.resize(contents.len() + contents[4] as usize * PRG_ROM_SIZE_FACTOR, 0xEE);
+
+        //  chr_rom
+        contents.resize(contents.len() + contents[5] as usize * CHR_ROM_SIZE_FACTOR, 0xDD);
+
+        tmp_file.write_all(contents.as_slice()).expect("failed to write");
+        tmp_file.flush();
+
+        // filename
+        let filename = file_name(&tmp_file.as_raw_fd()).unwrap();
+        let os_str = filename.into_os_string();
+
+        (tmp_file, String::from(os_str.to_str().unwrap()))
+    }
+
+
+    #[test]
+    fn test_ines_parsing() {
+        // No trainer
+        let (tmp_file, filename) = generate_file( false);
+        let rom = INESFormat::from(filename.as_str());
+
+        assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 24592);
+        assert_eq!(rom.header.magic_const, [0x4E, 0x45, 0x53, 0x1A]);
+        assert_eq!(rom.header.flags_6, 0);
+        assert_eq!(rom.trainer.len(), 0);
+
+        assert_eq!(rom.prg_rom.len(), 1 * PRG_ROM_SIZE_FACTOR);
+        assert_eq!(&[0xEE as u8; 1 * PRG_ROM_SIZE_FACTOR], &rom.prg_rom[..]);
+
+        assert_eq!(rom.chr_rom.len(), 1 * CHR_ROM_SIZE_FACTOR);
+        assert_eq!(&[0xDD as u8; 1 * CHR_ROM_SIZE_FACTOR], &rom.chr_rom[..]);
+
+
+        // With trainer
+        let (tmp_file, filename) = generate_file( true);
+        let rom = INESFormat::from(filename.as_str());
+
+        assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 25104);
+        assert_eq!(rom.header.magic_const, [0x4E, 0x45, 0x53, 0x1A]);
+        assert_eq!(rom.header.flags_6, 0);
+        assert_eq!(rom.trainer.len(), 512);
+
+        assert_eq!(rom.prg_rom.len(), 1 * PRG_ROM_SIZE_FACTOR);
+        assert_eq!(&[0xEE as u8; 1 * PRG_ROM_SIZE_FACTOR], &rom.prg_rom[..]);
+
+        assert_eq!(rom.chr_rom.len(), 1 * CHR_ROM_SIZE_FACTOR);
+        assert_eq!(&[0xDD as u8; 1 * CHR_ROM_SIZE_FACTOR], &rom.chr_rom[..]);
+    }
+
 }

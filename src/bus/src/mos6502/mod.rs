@@ -276,25 +276,25 @@ mod tests {
     }
 
     // TODO implement vectors otherise this test will fail
-    //
-    // #[test]
-    // fn test_cpu_reset() {
-    //     let mut cpu = Mos6502::new();
-    //     let mut bus = Bus::new();
-    //
-    //     bus.write_u16(0xFFFC, 0x1234);
-    //     cpu.a = 0x1;
-    //     cpu.x = 0x1;
-    //     cpu.y = 0x1;
-    //     cpu.sp = 0xC0;
-    //     cpu.flags = 0xFF;
-    //
-    //     cpu.reset(&bus);
-    //     assert_eq!(cpu.a, 0);
-    //     assert_eq!(cpu.x, 0);
-    //     assert_eq!(cpu.y, 0);
-    //     assert_eq!(cpu.sp, 0xFD);
-    //     assert_eq!(cpu.flags, 0b0010_0000);
-    //     assert_eq!(cpu.cycles, 8);
-    // }
+    #[test]
+    #[ignore]
+    fn test_cpu_reset() {
+        let mut cpu = Mos6502::new();
+        let mut bus = Bus::new();
+
+        bus.write_u16(0xFFFC, 0x1234);
+        cpu.a = 0x1;
+        cpu.x = 0x1;
+        cpu.y = 0x1;
+        cpu.sp = 0xC0;
+        cpu.flags = 0xFF;
+
+        cpu.reset(&bus);
+        assert_eq!(cpu.a, 0);
+        assert_eq!(cpu.x, 0);
+        assert_eq!(cpu.y, 0);
+        assert_eq!(cpu.sp, 0xFD);
+        assert_eq!(cpu.flags, 0b0010_0000);
+        assert_eq!(cpu.cycles, 8);
+    }
 }
