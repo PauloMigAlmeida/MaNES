@@ -1,4 +1,4 @@
-extern crate core;
+use crate::cartridge::Cartridge;
 
 // Notes to myself:
 //     - Implement some sort of subscribe mechanism that allow components to register their
@@ -7,7 +7,8 @@ extern crate core;
 //
 //     - implement logic to write/read data to/from the right component in the bus
 pub mod mos6502;
-mod cartridge;
+pub mod inesformat;
+pub mod cartridge;
 
 const RAM_SIZE: u16 = 0x0800; // CPU has a whopping 2KB RAM
 // const MAX_ROM_SIZE: usize = (RAM_SIZE - ROM_START_ADDR) as usize;
@@ -16,6 +17,7 @@ pub const ROM_START_ADDR: u16 = 0x8000;
 pub struct Bus {
     ram: [u8; RAM_SIZE as usize + 1],
     system_clock: u64,
+    cartridge: Cartridge,
 }
 
 impl Bus {
@@ -23,6 +25,7 @@ impl Bus {
         Bus {
             ram: [0; RAM_SIZE as usize + 1],
             system_clock: 0,
+            cartridge: Cartridge::new(),
         }
     }
 
@@ -61,16 +64,10 @@ impl Bus {
         self.write_u8(addr + 1, high);
     }
 
-    // pub fn load_to_ram(&mut self, start: u16, content: &[u8]) {
-    //     // sanity checks
-    //     let rom_size: usize = if content.len() > MAX_ROM_SIZE { MAX_ROM_SIZE } else { content.len() };
-    //
-    //     let mut j = start as usize;
-    //     for i in 0..rom_size {
-    //         self.ram[j] = content[i];
-    //         j += 1;
-    //     }
-    // }
+    pub fn load_cartridge(&mut self, filename: &str) -> Result<(), &str> {
+        self.cartridge.load(filename).expect("failed to load cartridge");
+        Ok(())
+    }
 
     pub fn reset(&mut self) {
         //cpu.reset()
@@ -94,19 +91,7 @@ mod test{
     #[test]
     fn test_memory_is_zeroed() {
         let bus = Bus::new();
-        let mut content = 0;
-        for i in bus.ram {
-            content += i;
-        }
-        assert_eq!(content, 0);
+        assert_eq!(&[0; RAM_SIZE as usize + 1], &bus.ram[..]);
     }
-
-    // #[test]
-    // fn test_load_memory() {
-    //     let mut bus = Bus::new();
-    //     let arr:[u8;5] = [1,2,3,4,5];
-    //     bus.load_to_ram(0x8000, &arr);
-    //     assert_eq!(&bus.ram[0x8000..0x8005], &arr);
-    // }
 
 }

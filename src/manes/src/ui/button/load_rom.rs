@@ -2,7 +2,6 @@ use gtk4::prelude::*;
 use gtk4::glib::clone;
 use gtk4::{ApplicationWindow, Button, FileChooserDialog, FileChooserAction, ResponseType, TextBuffer};
 use std::rc::Rc;
-use gtk4::gio::Cancellable;
 use crate::{manes_bus};
 use crate::ui::textview::rom_disassembly::{rom_disassembly_curr_state,manes_rom_disassembly_textview};
 use crate::ui::textview::mem_view::{mem_view_curr_state, manes_mem_view_textview};
@@ -37,11 +36,19 @@ pub fn load_rom_button_events_setup(window: &ApplicationWindow) {
                         ResponseType::Ok => {
                             println!("Chose OK");
                             let file = dialog.file().expect("A file must specified");
-                            let (vec_bytes, _) = file.load_contents(Cancellable::NONE).expect("test");
 
+                            let mut filename = String::from(file.uri().as_str());
+                            if filename.starts_with("file://"){
+                                filename = filename.replace("file://","");
+                            }
                             println!("Loading to ram");
-                                //TODO uncomment when you finish implementing cartridge
-                            // manes_bus().as_ref().borrow_mut().load_to_ram(ROM_START_ADDR, vec_bytes.as_slice());
+
+                            println!("filename: {}", filename);
+
+                            manes_bus()
+                                .as_ref()
+                                .borrow_mut()
+                                .load_cartridge(filename.as_str());
 
                             println!("Disassembling");
                             manes_rom_disassembly_textview()
