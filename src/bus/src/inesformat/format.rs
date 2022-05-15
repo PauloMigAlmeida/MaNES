@@ -1,8 +1,8 @@
 use super::*;
 use super::header::*;
 
-const PRG_ROM_SIZE_FACTOR:usize = 16384;
-const CHR_ROM_SIZE_FACTOR:usize = 8192;
+pub const PRG_ROM_SIZE_FACTOR:usize = 16384;
+pub const CHR_ROM_SIZE_FACTOR:usize = 8192;
 
 pub struct INESFormat {
     // Header (16 bytes)
@@ -67,43 +67,13 @@ impl INESFormat {
 
 #[cfg(test)]
 mod tests {
-    use std::io::{Write};
-    use std::os::unix::prelude::*;
-    use tempfile::NamedTempFile;
-    use filename::file_name;
     use super::*;
-
-    fn generate_file(add_trainer: bool) -> (NamedTempFile, String) {
-        let mut tmp_file = NamedTempFile::new().unwrap();
-
-        // header
-        let mut contents:Vec<u8> = vec![0x4E, 0x45, 0x53, 0x1A, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-        if add_trainer {
-            contents[6] |= 0x4;
-            contents.resize(contents.len() + 512, 0xFF);
-        }
-
-        //  prg_rom
-        contents.resize(contents.len() + contents[4] as usize * PRG_ROM_SIZE_FACTOR, 0xEE);
-
-        //  chr_rom
-        contents.resize(contents.len() + contents[5] as usize * CHR_ROM_SIZE_FACTOR, 0xDD);
-
-        tmp_file.write_all(contents.as_slice()).expect("failed to write");
-
-        // filename
-        let filename = file_name(&tmp_file.as_raw_fd()).unwrap();
-        let os_str = filename.into_os_string();
-
-        (tmp_file, String::from(os_str.to_str().unwrap()))
-    }
-
+    use crate::test::generate_rom;
 
     #[test]
     fn test_ines_parsing() {
         // No trainer
-        let (tmp_file, filename) = generate_file( false);
+        let (tmp_file, filename) = generate_rom(false, 0);
         let rom = INESFormat::from(filename.as_str()).unwrap();
 
         assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 24592);
@@ -120,7 +90,7 @@ mod tests {
         assert_eq!(&[0xDD as u8; 1 * CHR_ROM_SIZE_FACTOR], &rom.chr_rom[..]);
 
         // With trainer
-        let (tmp_file, filename) = generate_file( true);
+        let (tmp_file, filename) = generate_rom(true, 0);
         let rom = INESFormat::from(filename.as_str()).unwrap();
 
         assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 25104);
