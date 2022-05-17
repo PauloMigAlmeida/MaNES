@@ -25,7 +25,7 @@ pub fn dec(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
             let orig_addr = bus.read_u16(cpu.pc + 1);
             orig_addr + cpu.x as u16
         },
-        _ => panic!("invalid addressing mode... aborting"),
+        _ => unreachable!("invalid addressing mode... aborting"),
     };
     bus.write_u8(addr, result);
 

@@ -23,7 +23,7 @@ pub fn jmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
             }
             addr_abs
         },
-        _ => panic!("invalid addressing mode for instruction")
+        _ => unreachable!("invalid addressing mode for instruction")
     };
 
     cpu.pc = addr;
