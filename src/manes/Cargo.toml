@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-mos6502 = { path = "../mos6502"}
 mos6502-disassembler = { path = "../mos6502-disassembler"}
 bus = { path = "../bus"}
 gtk4 = "0.4.7"

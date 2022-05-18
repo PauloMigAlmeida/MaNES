@@ -35,7 +35,9 @@ pub fn rom_disassembly_curr_state() -> String {
     let mut content = String::new();
     content.push_str("[ROM Disassembly]\n\n");
 
-    let rom_mem = bus.read_u8_slice(ROM_START_ADDR, 0xffff);
+    //TODO replace it when Mapper logic is implemented
+    // let rom_mem = bus.read_u8_slice(ROM_START_ADDR, 0xffff);
+    let rom_mem = bus.read_u8_slice(0x0, 0x1fff);
     content.push_str(disassemble_program(rom_mem, ROM_START_ADDR, true).as_str());
     content
 }

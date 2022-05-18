@@ -29,7 +29,8 @@ pub fn mem_view_curr_state() -> String {
     let mut content = String::new();
     content.push_str("[Memory Area Visualisation]\n\n");
 
-    for i in (0..=0xffff).step_by(16) {
+    //TODO replace with it full address space once mappers are in-place (0xffff)
+    for i in (0..=0x1fff).step_by(16) {
         let v_0 = bus.read_u8(i);
         let v_1 = bus.read_u8(i + 1);
         let v_2 = bus.read_u8(i + 2);

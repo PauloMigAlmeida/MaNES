@@ -1,6 +1,6 @@
 use gtk4::Application;
 use std::{cell::RefCell, rc::Rc};
-use mos6502::Mos6502;
+use bus::mos6502::Mos6502;
 use bus::Bus;
 
 thread_local!(
