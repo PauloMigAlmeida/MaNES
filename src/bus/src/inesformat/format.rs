@@ -45,12 +45,18 @@ impl INESFormat {
             pos += 512;
         }
 
-        rom.prg_rom.resize(rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR, 0);
-        rom.prg_rom.copy_from_slice(&bytes[pos..(pos + rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR)]);
-        pos += rom.prg_rom.len();
+        if rom.header.flags_7 & 0x0C == 0x08 {
+            //TODO implement INES format v2
+            return Err("INES format v2 is not yet implemented");
+        } else {
+            // ines format v 1
+            rom.prg_rom.resize(rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR, 0);
+            rom.prg_rom.copy_from_slice(&bytes[pos..(pos + rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR)]);
+            pos += rom.prg_rom.len();
 
-        rom.chr_rom.resize(rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR, 0);
-        rom.chr_rom.copy_from_slice(&bytes[pos..(pos + rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR)]);
+            rom.chr_rom.resize(rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR, 0);
+            rom.chr_rom.copy_from_slice(&bytes[pos..(pos + rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR)]);
+        }
 
         Ok(rom)
     }
@@ -73,7 +79,7 @@ mod tests {
     #[test]
     fn test_ines_parsing() {
         // No trainer
-        let (tmp_file, filename) = generate_rom(false, 0);
+        let (tmp_file, filename) = generate_rom(false, 0, 1);
         let rom = INESFormat::from(filename.as_str()).unwrap();
 
         assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 24592);
@@ -90,7 +96,7 @@ mod tests {
         assert_eq!(&[0xDD as u8; 1 * CHR_ROM_SIZE_FACTOR], &rom.chr_rom[..]);
 
         // With trainer
-        let (tmp_file, filename) = generate_rom(true, 0);
+        let (tmp_file, filename) = generate_rom(true, 0, 1);
         let rom = INESFormat::from(filename.as_str()).unwrap();
 
         assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 25104);
@@ -105,6 +111,15 @@ mod tests {
 
         assert_eq!(rom.chr_rom.len(), 1 * CHR_ROM_SIZE_FACTOR);
         assert_eq!(&[0xDD as u8; 1 * CHR_ROM_SIZE_FACTOR], &rom.chr_rom[..]);
+    }
+
+    #[test]
+    fn test_ines_format_v2() {
+        let (tmp_file, filename) = generate_rom(false, 0, 2);
+        let result = INESFormat::from(filename.as_str());
+
+        assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 16);
+        assert!(result.is_err());
     }
 
 }

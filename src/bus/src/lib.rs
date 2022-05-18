@@ -93,7 +93,7 @@ mod test{
     use filename::file_name;
     use crate::inesformat::format::{CHR_ROM_SIZE_FACTOR, PRG_ROM_SIZE_FACTOR};
 
-    pub fn generate_rom(add_trainer: bool, mapper_id: u8) -> (NamedTempFile, String) {
+    pub fn generate_rom(add_trainer: bool, mapper_id: u8, ines_file_version: u8) -> (NamedTempFile, String) {
         let mut tmp_file = NamedTempFile::new().unwrap();
 
         // header
@@ -113,11 +113,15 @@ mod test{
             contents.resize(contents.len() + 512, 0xFF);
         }
 
-        //  prg_rom
-        contents.resize(contents.len() + contents[4] as usize * PRG_ROM_SIZE_FACTOR, 0xEE);
+        if ines_file_version == 1 {
+            //  prg_rom
+            contents.resize(contents.len() + contents[4] as usize * PRG_ROM_SIZE_FACTOR, 0xEE);
 
-        //  chr_rom
-        contents.resize(contents.len() + contents[5] as usize * CHR_ROM_SIZE_FACTOR, 0xDD);
+            //  chr_rom
+            contents.resize(contents.len() + contents[5] as usize * CHR_ROM_SIZE_FACTOR, 0xDD);
+        } else if ines_file_version == 2 {
+            contents[7] |= 0x08;
+        }
 
         tmp_file.write_all(contents.as_slice()).expect("failed to write");
 

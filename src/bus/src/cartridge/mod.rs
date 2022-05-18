@@ -36,7 +36,7 @@ mod test {
 
     #[test]
     fn test_load_cartridge() {
-        let (tmp_file, filename) = generate_rom(false, 0);
+        let (_tmp_file, filename) = generate_rom(false, 0, 1);
         let mut cartridge = Cartridge::new();
         cartridge.load(filename.as_str()).expect("Failed loading file");
 
@@ -49,14 +49,14 @@ mod test {
 
     #[test]
     fn test_mapper_id_value_retrieval() {
-        let (tmp_file, filename) = generate_rom(false, 1);
+        let (_tmp_file, filename) = generate_rom(false, 1, 1);
         let mut cartridge = Cartridge::new();
         cartridge.load(filename.as_str()).expect("Failed loading file");
 
         assert_eq!(cartridge.mapper_id, 1);
 
         // test mappers which contains two nibbles
-        let (tmp_file, filename) = generate_rom(false, 0xfe);
+        let (_tmp_file, filename) = generate_rom(false, 0xfe, 1);
         let mut cartridge = Cartridge::new();
         cartridge.load(filename.as_str()).expect("Failed loading file");
 
