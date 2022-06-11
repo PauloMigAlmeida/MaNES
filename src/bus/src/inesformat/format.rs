@@ -1,8 +1,8 @@
 use super::*;
 use super::header::*;
 
-pub const PRG_ROM_SIZE_FACTOR:usize = 16384;
-pub const CHR_ROM_SIZE_FACTOR:usize = 8192;
+pub const PRG_ROM_SIZE_FACTOR: usize = 16384;
+pub const CHR_ROM_SIZE_FACTOR: usize = 8192;
 
 pub struct INESFormat {
     // Header (16 bytes)
@@ -31,7 +31,7 @@ impl INESFormat {
         }
     }
 
-    pub fn from(filename: &str) -> Result<Self,&str> {
+    pub fn from(filename: &str) -> Result<Self, &str> {
         let mut rom = INESFormat::new();
         let bytes = rom.read_file(filename).expect("err reading file");
         let mut pos = 0 as usize;
@@ -39,23 +39,23 @@ impl INESFormat {
         rom.header = Header::from(&bytes).expect("invalid iNES Header");
         pos += 16;
 
-        if rom.header.flags_6 & 0x4 == 0x4 {
-            rom.trainer.resize(512,0);
-            rom.trainer.copy_from_slice(&bytes[pos..(pos + 512)]);
-            pos += 512;
-        }
+        match rom.header.format_version() {
+            HeaderVersion::V1 => {
+                if rom.header.flags_6 & 0x4 == 0x4 {
+                    rom.trainer.resize(512, 0);
+                    rom.trainer.copy_from_slice(&bytes[pos..(pos + 512)]);
+                    pos += 512;
+                }
 
-        if rom.header.flags_7 & 0x0C == 0x08 {
-            //TODO implement INES format v2
-            return Err("INES format v2 is not yet implemented");
-        } else {
-            // ines format v 1
-            rom.prg_rom.resize(rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR, 0);
-            rom.prg_rom.copy_from_slice(&bytes[pos..(pos + rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR)]);
-            pos += rom.prg_rom.len();
+                // ines format v 1
+                rom.prg_rom.resize(rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR, 0);
+                rom.prg_rom.copy_from_slice(&bytes[pos..(pos + rom.header.prg_rom_size as usize * PRG_ROM_SIZE_FACTOR)]);
+                pos += rom.prg_rom.len();
 
-            rom.chr_rom.resize(rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR, 0);
-            rom.chr_rom.copy_from_slice(&bytes[pos..(pos + rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR)]);
+                rom.chr_rom.resize(rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR, 0);
+                rom.chr_rom.copy_from_slice(&bytes[pos..(pos + rom.header.chr_rom_size as usize * CHR_ROM_SIZE_FACTOR)]);
+            },
+            _  => panic!("not supported/invalid ines format version")
         }
 
         Ok(rom)
@@ -114,6 +114,7 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
     fn test_ines_format_v2() {
         let (tmp_file, filename) = generate_rom(false, 0, 2);
         let result = INESFormat::from(filename.as_str());
@@ -121,5 +122,4 @@ mod tests {
         assert_eq!(tmp_file.as_file().metadata().unwrap().len(), 16);
         assert!(result.is_err());
     }
-
 }
