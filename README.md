@@ -11,6 +11,11 @@ Throughout his life, he managed to turn the word "Mane" into some sort of seal o
 
 He is pretty old now (83ish) and I would like to show him the "Mane Nintendo Entertainment System" to see him smile again with that joke :)
 
+[Update: 05/06/2022] :: the doctor said his heart is very frail and that he could pass away at anytime now. Unfortunately, I don't think I will have enough time to finish this project... so I took sometime to explain to him what this is and why I named it after him... I got the laugh I was looking for. That will live in my memory forever. 
+
+![7724670e-c379-4557-9f53-9c2411c6f19e](https://user-images.githubusercontent.com/1011868/173266995-fe94c1d2-42fa-4922-9877-95becbaa71a6.jpg)
+![f7dbb2fc-d2e2-4557-aa73-28351546c692](https://user-images.githubusercontent.com/1011868/173267217-6a0f3375-acab-41fa-be86-a5b55522f0cf.jpg)
+
 ## Wishlist
 To make sure I won't lose focus on what I want this emulator to be able to do, I decided to write a list of features
 that I want to implement in the short to medium term.
