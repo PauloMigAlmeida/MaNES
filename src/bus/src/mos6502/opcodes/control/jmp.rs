@@ -8,18 +8,18 @@ pub fn jmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
 
     let addr = match inst.mode {
         Absolute => {
-            bus.read_u16(cpu.pc + 1)
+            bus.cpu_read_u16(cpu.pc + 1)
         },
         Indirect => {
-            let addr_ptr = bus.read_u16(cpu.pc + 1);
+            let addr_ptr = bus.cpu_read_u16(cpu.pc + 1);
             let addr_abs:u16;
 
             if (addr_ptr & 0xFF) == 0xFF {
                 // Simulate page boundary hardware bug
-                addr_abs = ((bus.read_u8(addr_ptr & 0xFF00) as u16) << 8)  | bus.read_u8(addr_ptr) as u16;
+                addr_abs = ((bus.cpu_read_u8(addr_ptr & 0xFF00) as u16) << 8)  | bus.cpu_read_u8(addr_ptr) as u16;
             }else {
                 // Behave normally
-                addr_abs = bus.read_u16(addr_ptr);
+                addr_abs = bus.cpu_read_u16(addr_ptr);
             }
             addr_abs
         },
@@ -53,7 +53,7 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u16(0x0801, 0x1234);
+        bus.cpu_write_u16(0x0801, 0x1234);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.flags, 0b0000_0011);
@@ -78,8 +78,8 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u16(0x0801, 0x1234);
-        bus.write_u16(0x1234, 0x0200);
+        bus.cpu_write_u16(0x0801, 0x1234);
+        bus.cpu_write_u16(0x1234, 0x0200);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.flags, 0b0000_0011);
@@ -97,9 +97,9 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u16(0x0801, 0x12FF);
-        bus.write_u16(0x12FF, 0x00);
-        bus.write_u16(0x1200, 0x02);
+        bus.cpu_write_u16(0x0801, 0x12FF);
+        bus.cpu_write_u16(0x12FF, 0x00);
+        bus.cpu_write_u16(0x1200, 0x02);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.flags, 0b0000_0011);

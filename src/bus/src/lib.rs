@@ -29,27 +29,27 @@ impl Bus {
         }
     }
 
-    pub fn read_u8(&self, addr: u16) -> u8 {
+    pub fn cpu_read_u8(&self, addr: u16) -> u8 {
         if addr <= 0x1FFF {
             return self.ram[(addr & 0x07FF) as usize]
         }
         panic!("invalid memory address requested... aborting")
     }
 
-    pub fn read_u8_slice(&self, from: u16, to: u16) -> &[u8] {
+    pub fn cpu_read_u8_slice(&self, from: u16, to: u16) -> &[u8] {
         if from <= 0x1FFF && to <= 0x1FFF && from < to {
             return &self.ram[((from & 0x07FF) as usize)..((to & 0x07FF) as usize)]
         }
         panic!("invalid memory range requested... aborting")
     }
 
-    pub fn read_u16(&self, addr: u16) -> u16 {
-        let low = self.read_u8(addr);
-        let high = self.read_u8(addr + 1);
+    pub fn cpu_read_u16(&self, addr: u16) -> u16 {
+        let low = self.cpu_read_u8(addr);
+        let high = self.cpu_read_u8(addr + 1);
         ((high as u16) << 8) | low as u16
     }
 
-    pub fn write_u8(&mut self, addr: u16, value: u8) {
+    pub fn cpu_write_u8(&mut self, addr: u16, value: u8) {
         if addr <= 0x1FFF {
             self.ram[(addr & 0x07FF) as usize] = value;
         } else {
@@ -57,11 +57,11 @@ impl Bus {
         }
     }
 
-    pub fn write_u16(&mut self, addr: u16, value: u16) {
+    pub fn cpu_write_u16(&mut self, addr: u16, value: u16) {
         let low = (value & 0xff) as u8;
         let high = ((value >> 8) & 0xff) as u8;
-        self.write_u8(addr, low);
-        self.write_u8(addr + 1, high);
+        self.cpu_write_u8(addr, low);
+        self.cpu_write_u8(addr + 1, high);
     }
 
     pub fn load_cartridge(&mut self, filename: &str) -> Result<(), &str> {
