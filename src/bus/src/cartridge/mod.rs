@@ -23,7 +23,7 @@ impl Cartridge {
         let mut rom = INESFormat::from(filename).expect("failed to parse rom");
         swap(&mut self.prg_rom, &mut rom.prg_rom);
         swap(&mut self.chr_rom, &mut rom.chr_rom);
-        self.mapper_id = (rom.header.flags_6 >> 4) | (rom.header.flags_7 & 0xF0);
+        self.mapper_id = rom.header.mapper_id();
         Ok(())
     }
 }

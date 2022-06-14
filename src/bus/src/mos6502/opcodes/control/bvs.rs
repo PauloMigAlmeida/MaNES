@@ -54,7 +54,7 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u8(cpu.pc + 1, 0x10);
+        bus.cpu_write_u8(cpu.pc + 1, 0x10);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.flags, 0b0000_0000);
@@ -72,7 +72,7 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u8(cpu.pc + 1, 0x10);
+        bus.cpu_write_u8(cpu.pc + 1, 0x10);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1); // branch to the same page cost 1 additional cycle
         assert_eq!(cpu.flags, 0b0100_0000);
@@ -90,7 +90,7 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u8(cpu.pc + 1, 0x10);
+        bus.cpu_write_u8(cpu.pc + 1, 0x10);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 2); // branch to the new page cost 2 additional cycles
         assert_eq!(cpu.flags, 0b0100_0000);
@@ -108,7 +108,7 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u8(cpu.pc + 1, 0xfa); // -6 two's complement
+        bus.cpu_write_u8(cpu.pc + 1, 0xfa); // -6 two's complement
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1); // branch to the same page cost 1 additional cycle
         assert_eq!(cpu.flags, 0b0100_0000);
@@ -126,7 +126,7 @@ mod tests {
         cpu.a = 0;
         cpu.x = 0;
         cpu.y = 0;
-        bus.write_u8(cpu.pc + 1, 0xfa); // -6 two's complement
+        bus.cpu_write_u8(cpu.pc + 1, 0xfa); // -6 two's complement
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 2); // branch to diff page cost 2 additional cycles
         assert_eq!(cpu.flags, 0b0100_0000);

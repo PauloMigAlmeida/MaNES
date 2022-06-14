@@ -31,22 +31,22 @@ pub fn mem_view_curr_state() -> String {
 
     //TODO replace with it full address space once mappers are in-place (0xffff)
     for i in (0..=0x1fff).step_by(16) {
-        let v_0 = bus.read_u8(i);
-        let v_1 = bus.read_u8(i + 1);
-        let v_2 = bus.read_u8(i + 2);
-        let v_3 = bus.read_u8(i + 3);
-        let v_4 = bus.read_u8(i + 4);
-        let v_5 = bus.read_u8(i + 5);
-        let v_6 = bus.read_u8(i + 6);
-        let v_7 = bus.read_u8(i + 7);
-        let v_8 = bus.read_u8(i + 8);
-        let v_9 = bus.read_u8(i + 9);
-        let v_10 = bus.read_u8(i + 10);
-        let v_11 = bus.read_u8(i + 11);
-        let v_12 = bus.read_u8(i + 12);
-        let v_13 = bus.read_u8(i + 13);
-        let v_14 = bus.read_u8(i + 14);
-        let v_15 = bus.read_u8(i + 15);
+        let v_0 = bus.cpu_read_u8(i, false);
+        let v_1 = bus.cpu_read_u8(i + 1, false);
+        let v_2 = bus.cpu_read_u8(i + 2, false);
+        let v_3 = bus.cpu_read_u8(i + 3, false);
+        let v_4 = bus.cpu_read_u8(i + 4, false);
+        let v_5 = bus.cpu_read_u8(i + 5, false);
+        let v_6 = bus.cpu_read_u8(i + 6, false);
+        let v_7 = bus.cpu_read_u8(i + 7, false);
+        let v_8 = bus.cpu_read_u8(i + 8, false);
+        let v_9 = bus.cpu_read_u8(i + 9, false);
+        let v_10 = bus.cpu_read_u8(i + 10, false);
+        let v_11 = bus.cpu_read_u8(i + 11, false);
+        let v_12 = bus.cpu_read_u8(i + 12, false);
+        let v_13 = bus.cpu_read_u8(i + 13, false);
+        let v_14 = bus.cpu_read_u8(i + 14, false);
+        let v_15 = bus.cpu_read_u8(i + 15, false);
         content.push_str(format!("{:04X}: {:02X} {:02X} {:02X} {:02X} \
                                                  {:02X} {:02X} {:02X} {:02X} \
                                                  {:02X} {:02X} {:02X} {:02X} \

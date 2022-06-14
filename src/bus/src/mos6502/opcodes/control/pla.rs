@@ -35,7 +35,7 @@ mod tests {
 
         // no flags set
         let (mut cpu, mut bus) = init();
-        bus.write_u8(0x1ff, 0xEE);
+        bus.cpu_write_u8(0x1ff, 0xEE);
         cpu.sp = 0xfe;
         cpu.pc = 0x0800;
         cpu.flags = 0b1100_1111;
@@ -53,7 +53,7 @@ mod tests {
 
         // Test zero flag
         let (mut cpu, mut bus) = init();
-        bus.write_u8(0x1ff, 0x0);
+        bus.cpu_write_u8(0x1ff, 0x0);
         cpu.sp = 0xfe;
         cpu.pc = 0x0800;
         cpu.flags = 0b0000_0000;
@@ -71,7 +71,7 @@ mod tests {
 
         // Test negative flag
         let (mut cpu, mut bus) = init();
-        bus.write_u8(0x1ff, 0x81);
+        bus.cpu_write_u8(0x1ff, 0x81);
         cpu.sp = 0xfe;
         cpu.pc = 0x0800;
         cpu.flags = 0b0000_0000;

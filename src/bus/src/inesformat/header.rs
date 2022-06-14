@@ -41,6 +41,11 @@ pub struct Header {
     pub unused: [u8; 5],
 }
 
+pub enum HeaderVersion {
+    V1,
+    V2,
+}
+
 impl Header {
     pub fn new() -> Self {
         Header {
@@ -83,6 +88,20 @@ impl Header {
         ret.flags_10 = content[10];
 
         Ok(ret)
+    }
+
+    pub fn format_version(&self) -> HeaderVersion {
+        if self.flags_7 & 0x0C == 0x08 {
+            panic!("INES format V2 isn't support yet");
+        }
+        HeaderVersion::V1
+    }
+
+    pub fn mapper_id(&self) -> u8 {
+        match self.format_version() {
+            HeaderVersion::V1 => (self.flags_6 >> 4) | (self.flags_7 & 0xF0),
+            _ => panic!("INES format V2 isn't support yet"),
+        }
     }
 }
 

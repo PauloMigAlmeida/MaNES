@@ -37,7 +37,7 @@ mod tests{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b0000_1100;
         cpu.pc = 0x10;
-        bus.write_u8(cpu.pc + 1, 0b0000_1000);
+        bus.cpu_write_u8(cpu.pc + 1, 0b0000_1000);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0000_1000);
@@ -51,7 +51,7 @@ mod tests{
         cpu.flags = 0b0000_0010;
         cpu.a = 0b0000_1100;
         cpu.pc = 0x10;
-        bus.write_u8(cpu.pc + 1, 0b0000_1000);
+        bus.cpu_write_u8(cpu.pc + 1, 0b0000_1000);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0000_1000);
@@ -65,7 +65,7 @@ mod tests{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x10;
-        bus.write_u8(cpu.pc + 1, 0b0000_0000);
+        bus.cpu_write_u8(cpu.pc + 1, 0b0000_0000);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0000_0000);
@@ -79,7 +79,7 @@ mod tests{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x10;
-        bus.write_u8(cpu.pc + 1, 0b1000_0000);
+        bus.cpu_write_u8(cpu.pc + 1, 0b1000_0000);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b1000_0000);
@@ -100,8 +100,8 @@ mod tests{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x0800;
-        bus.write_u8(cpu.pc + 1, 0x10);
-        bus.write_u8(0x0010, 0b0000_1111); // write to zero page
+        bus.cpu_write_u8(cpu.pc + 1, 0x10);
+        bus.cpu_write_u8(0x0010, 0b0000_1111); // write to zero page
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0000_1111);
@@ -123,8 +123,8 @@ mod tests{
         cpu.a = 0b1111_1111;
         cpu.x = 0x01;
         cpu.pc = 0x0800;
-        bus.write_u8(cpu.pc + 1, 0x10);
-        bus.write_u8(0x11, 0b0000_1111); // write to zero page
+        bus.cpu_write_u8(cpu.pc + 1, 0x10);
+        bus.cpu_write_u8(0x11, 0b0000_1111); // write to zero page
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0000_1111);
@@ -139,8 +139,8 @@ mod tests{
         cpu.a = 0b1111_1111;
         cpu.x = 0xFF;
         cpu.pc = 0x0800;
-        bus.write_u8(cpu.pc + 1, 0x10);
-        bus.write_u8(0xF, 0b0001_1111); // write to zero page
+        bus.cpu_write_u8(cpu.pc + 1, 0x10);
+        bus.cpu_write_u8(0xF, 0b0001_1111); // write to zero page
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -161,8 +161,8 @@ mod tests{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x0800;
-        bus.write_u16(cpu.pc + 1, 0x1234);
-        bus.write_u8(0x1234, 0b0001_1111);
+        bus.cpu_write_u16(cpu.pc + 1, 0x1234);
+        bus.cpu_write_u8(0x1234, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -184,8 +184,8 @@ mod tests{
         cpu.a = 0b1111_1111;
         cpu.x = 0x10;
         cpu.pc = 0x0800;
-        bus.write_u16(cpu.pc + 1, 0x1234);
-        bus.write_u8(0x1244, 0b0001_1111);
+        bus.cpu_write_u16(cpu.pc + 1, 0x1234);
+        bus.cpu_write_u8(0x1244, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -200,8 +200,8 @@ mod tests{
         cpu.a = 0b1111_1111;
         cpu.x = 0xFF;
         cpu.pc = 0x0800;
-        bus.write_u16(cpu.pc + 1, 0x1234);
-        bus.write_u8(0x1333, 0b0001_1111);
+        bus.cpu_write_u16(cpu.pc + 1, 0x1234);
+        bus.cpu_write_u8(0x1333, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -223,8 +223,8 @@ mod tests{
         cpu.a = 0b1111_1111;
         cpu.y = 0x10;
         cpu.pc = 0x0800;
-        bus.write_u16(cpu.pc + 1, 0x1234);
-        bus.write_u8(0x1244, 0b0001_1111);
+        bus.cpu_write_u16(cpu.pc + 1, 0x1234);
+        bus.cpu_write_u8(0x1244, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -239,8 +239,8 @@ mod tests{
         cpu.a = 0b1111_1111;
         cpu.y = 0xFF;
         cpu.pc = 0x0800;
-        bus.write_u16(cpu.pc + 1, 0x1234);
-        bus.write_u8(0x1333, 0b0001_1111);
+        bus.cpu_write_u16(cpu.pc + 1, 0x1234);
+        bus.cpu_write_u8(0x1333, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -261,10 +261,10 @@ mod tests{
         cpu.flags = 0b0000_0000;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x0800;
-        bus.write_u8(cpu.pc + 1, 0x34);
-        bus.write_u8(0x34, 0x34);
-        bus.write_u8(0x35, 0x12);
-        bus.write_u8(0x1234, 0b0001_1111);
+        bus.cpu_write_u8(cpu.pc + 1, 0x34);
+        bus.cpu_write_u8(0x34, 0x34);
+        bus.cpu_write_u8(0x35, 0x12);
+        bus.cpu_write_u8(0x1234, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -286,10 +286,10 @@ mod tests{
         cpu.y = 0x1;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x0800;
-        bus.write_u8(cpu.pc + 1, 0x34);
-        bus.write_u8(0x34, 0x34);
-        bus.write_u8(0x35, 0x12);
-        bus.write_u8(0x1234 + cpu.y as u16, 0b0001_1111);
+        bus.cpu_write_u8(cpu.pc + 1, 0x34);
+        bus.cpu_write_u8(0x34, 0x34);
+        bus.cpu_write_u8(0x35, 0x12);
+        bus.cpu_write_u8(0x1234 + cpu.y as u16, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.a, 0b0001_1111);
@@ -305,10 +305,10 @@ mod tests{
         cpu.y = 0xff;
         cpu.a = 0b1111_1111;
         cpu.pc = 0x0800;
-        bus.write_u8(cpu.pc + 1, 0x34);
-        bus.write_u8(0x34, 0x34);
-        bus.write_u8(0x35, 0x12);
-        bus.write_u8(0x1234 + cpu.y as u16, 0b0001_1111);
+        bus.cpu_write_u8(cpu.pc + 1, 0x34);
+        bus.cpu_write_u8(0x34, 0x34);
+        bus.cpu_write_u8(0x35, 0x12);
+        bus.cpu_write_u8(0x1234 + cpu.y as u16, 0b0001_1111);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles + 1);
         assert_eq!(cpu.a, 0b0001_1111);

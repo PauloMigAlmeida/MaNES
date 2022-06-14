@@ -28,7 +28,7 @@ mod tests {
         assert_eq!(opcode.name, OPCODE_NAME);
 
         let (mut cpu, mut bus) = init();
-        bus.write_u8(0x01ff, 0b1100_1111);
+        bus.cpu_write_u8(0x01ff, 0b1100_1111);
         cpu.sp = 0xfe;
         cpu.pc = 0x0800;
         cpu.flags = 0;

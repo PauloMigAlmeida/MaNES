@@ -37,7 +37,7 @@ pub fn rom_disassembly_curr_state() -> String {
 
     //TODO replace it when Mapper logic is implemented
     // let rom_mem = bus.read_u8_slice(ROM_START_ADDR, 0xffff);
-    let rom_mem = bus.read_u8_slice(0x0, 0x1fff);
+    let rom_mem = bus.cpu_read_u8_slice(0x0, 0x1fff);
     content.push_str(disassemble_program(rom_mem, ROM_START_ADDR, true).as_str());
     content
 }

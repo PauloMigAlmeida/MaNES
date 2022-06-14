@@ -40,6 +40,6 @@ mod tests {
         assert_eq!(cpu.y, 0);
         assert_eq!(cpu.pc, 0x0801);
         assert_eq!(cpu.sp, 0xfe);
-        assert_eq!(bus.read_u8(0x01ff), 0x10);
+        assert_eq!(bus.cpu_read_u8(0x01ff, false), 0x10);
     }
 }
