@@ -15,7 +15,7 @@ pub fn jsr(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     cpu.pc += inst.bytes as u16 - 1;
     cpu.stack_push(((cpu.pc >> 8) & 0x00FF) as u8, bus);
     cpu.stack_push((cpu.pc & 0x00FF) as u8, bus);
-    cpu.pc = bus.cpu_read_u16(old_pc + 1);
+    cpu.pc = bus.cpu_read_u16(old_pc + 1, false);
     0
 }
 
@@ -51,6 +51,6 @@ mod tests {
         assert_eq!(cpu.y, 0);
         assert_eq!(cpu.pc, 0x1234);
         assert_eq!(cpu.sp, 0xfd);
-        assert_eq!(bus.cpu_read_u16(0x01FE), 0x0802);
+        assert_eq!(bus.cpu_read_u16(0x01FE, false), 0x0802);
     }
 }

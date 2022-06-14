@@ -35,7 +35,7 @@ impl Mos6502 {
 
     pub fn reset(&mut self, bus: & Bus) {
         // Get address to set program counter to
-        self.pc = bus.cpu_read_u16(0xFFFC);
+        self.pc = bus.cpu_read_u16(0xFFFC, false);
 
         // reset regs
         self.a = 0;
@@ -97,7 +97,7 @@ impl Mos6502 {
 
         self.sp += 1;
         let addr: u16 = STACK_PAGE | self.sp  as u16;
-        let value = bus.cpu_read_u8(addr);
+        let value = bus.cpu_read_u8(addr, false);
         value
     }
 
@@ -107,30 +107,30 @@ impl Mos6502 {
         let mut additional_cycle= 0;
 
         let fetched= match inst.mode {
-            AddressingMode::Immediate | AddressingMode::Relative => bus.cpu_read_u8(self.pc + 1),
+            AddressingMode::Immediate | AddressingMode::Relative => bus.cpu_read_u8(self.pc + 1, false),
             AddressingMode::Accumulator => self.a,
             AddressingMode::ZeroPage => {
-                let addr = bus.cpu_read_u8(self.pc + 1);
-                bus.cpu_read_u8(addr as u16)
+                let addr = bus.cpu_read_u8(self.pc + 1, false);
+                bus.cpu_read_u8(addr as u16, false)
             },
             AddressingMode::ZeroPageX => {
                 // val = PEEK((arg + X) % 256) to simulate hardware bug in 6502
-                let mut addr = bus.cpu_read_u8(self.pc + 1) as u16;
+                let mut addr = bus.cpu_read_u8(self.pc + 1, false) as u16;
                 addr = (addr + self.x as u16) % 256;
-                bus.cpu_read_u8(addr)
+                bus.cpu_read_u8(addr, false)
             },
             AddressingMode::ZeroPageY => {
                 // val = PEEK((arg + Y) % 256) to simulate hardware bug in 6502
-                let mut addr = bus.cpu_read_u8(self.pc + 1) as u16;
+                let mut addr = bus.cpu_read_u8(self.pc + 1, false) as u16;
                 addr = (addr + self.y as u16) % 256;
-                bus.cpu_read_u8(addr)
+                bus.cpu_read_u8(addr, false)
             },
             AddressingMode::Absolute => {
-                let addr = bus.cpu_read_u16(self.pc + 1);
-                bus.cpu_read_u8(addr)
+                let addr = bus.cpu_read_u16(self.pc + 1, false);
+                bus.cpu_read_u8(addr, false)
             },
             AddressingMode::AbsoluteX => {
-                let orig_addr = bus.cpu_read_u16(self.pc + 1);
+                let orig_addr = bus.cpu_read_u16(self.pc + 1, false);
                 let addr = orig_addr + self.x as u16;
 
                 // page crossing costs 1 additional cycle.. Joao would be proud of me now <3
@@ -138,10 +138,10 @@ impl Mos6502 {
                     additional_cycle = 1;
                 }
 
-                bus.cpu_read_u8(addr)
+                bus.cpu_read_u8(addr, false)
             },
             AddressingMode::AbsoluteY => {
-                let orig_addr = bus.cpu_read_u16(self.pc + 1);
+                let orig_addr = bus.cpu_read_u16(self.pc + 1, false);
                 let addr = orig_addr + self.y as u16;
 
                 // page crossing costs 1 additional cycle
@@ -149,20 +149,20 @@ impl Mos6502 {
                     additional_cycle = 1;
                 }
 
-                bus.cpu_read_u8(addr)
+                bus.cpu_read_u8(addr, false)
             },
             AddressingMode::IndirectX => {
                 // val = PEEK(PEEK((arg + X) % 256) + PEEK((arg + X + 1) % 256) * 256)
-                let arg = bus.cpu_read_u8(self.pc + 1) as u16;
-                let low = bus.cpu_read_u8((arg + self.x as u16) & 0xff) as u16;
-                let high = bus.cpu_read_u8((arg + self.x as u16 + 1) & 0xff) as u16;
-                bus.cpu_read_u8((high << 8) | low)
+                let arg = bus.cpu_read_u8(self.pc + 1, false) as u16;
+                let low = bus.cpu_read_u8((arg + self.x as u16) & 0xff, false) as u16;
+                let high = bus.cpu_read_u8((arg + self.x as u16 + 1) & 0xff, false) as u16;
+                bus.cpu_read_u8((high << 8) | low, false)
             },
             AddressingMode::IndirectY => {
                 // val = PEEK(PEEK(arg) + PEEK((arg + 1) % 256) * 256 + Y)
-                let arg = bus.cpu_read_u8(self.pc + 1) as u16;
-                let low = bus.cpu_read_u8(arg  & 0xff) as u16;
-                let high = bus.cpu_read_u8((arg + 1) & 0xff) as u16;
+                let arg = bus.cpu_read_u8(self.pc + 1, false) as u16;
+                let low = bus.cpu_read_u8(arg  & 0xff, false) as u16;
+                let high = bus.cpu_read_u8((arg + 1) & 0xff, false) as u16;
 
                 let orig_addr = (high << 8) | low;
                 let addr = orig_addr + self.y as u16;
@@ -172,7 +172,7 @@ impl Mos6502 {
                     additional_cycle = 1;
                 }
 
-                bus.cpu_read_u8(addr)
+                bus.cpu_read_u8(addr, false)
             },
             _ => panic!("invalid addressing mode... aborting"),
         };
@@ -237,8 +237,8 @@ mod tests {
         assert_eq!(cpu.sp, 0xfe);
         cpu.stack_push(0x11, &mut bus);
         assert_eq!(cpu.sp, 0xfd);
-        assert_eq!(bus.cpu_read_u8(STACK_PAGE | 0xff), 0x10);
-        assert_eq!(bus.cpu_read_u8(STACK_PAGE | 0xfe), 0x11);
+        assert_eq!(bus.cpu_read_u8(STACK_PAGE | 0xff, false), 0x10);
+        assert_eq!(bus.cpu_read_u8(STACK_PAGE | 0xfe, false), 0x11);
     }
 
     #[test]

@@ -12,17 +12,17 @@ pub fn dec(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
 
     let addr = match inst.mode {
         ZeroPage => {
-            bus.cpu_read_u8(cpu.pc + 1) as u16
+            bus.cpu_read_u8(cpu.pc + 1, false) as u16
         },
         ZeroPageX => {
-            let addr = bus.cpu_read_u8(cpu.pc + 1) as u16;
+            let addr = bus.cpu_read_u8(cpu.pc + 1, false) as u16;
             (addr + cpu.x as u16) % 256
         },
         Absolute => {
-            bus.cpu_read_u16(cpu.pc + 1)
+            bus.cpu_read_u16(cpu.pc + 1, false)
         },
         AbsoluteX => {
-            let orig_addr = bus.cpu_read_u16(cpu.pc + 1);
+            let orig_addr = bus.cpu_read_u16(cpu.pc + 1, false);
             orig_addr + cpu.x as u16
         },
         _ => unreachable!("invalid addressing mode... aborting"),
@@ -62,7 +62,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x10), 0b0000_0001);
+        assert_eq!(bus.cpu_read_u8(0x10, false), 0b0000_0001);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
@@ -78,7 +78,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x10), 0b0000_0001);
+        assert_eq!(bus.cpu_read_u8(0x10, false), 0b0000_0001);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
@@ -94,7 +94,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x10), 0x0);
+        assert_eq!(bus.cpu_read_u8(0x10, false), 0x0);
         assert_eq!(cpu.flags, 0b0000_0010);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
@@ -110,7 +110,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x10), 0b1111_1111); // -1 two's complement
+        assert_eq!(bus.cpu_read_u8(0x10, false), 0b1111_1111); // -1 two's complement
         assert_eq!(cpu.flags, 0b1000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
@@ -126,7 +126,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x10), 0b1111_0101); // -11 two's complement
+        assert_eq!(bus.cpu_read_u8(0x10, false), 0b1111_0101); // -11 two's complement
         assert_eq!(cpu.flags, 0b1000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
@@ -149,7 +149,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x11), 0x1);
+        assert_eq!(bus.cpu_read_u8(0x11, false), 0x1);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0802);
         assert_eq!(cpu.sp, 0xff);
@@ -170,7 +170,7 @@ mod tests {
         bus.cpu_write_u8(0x1234, 0x2);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(bus.cpu_read_u8(0x1234), 0x1);
+        assert_eq!(bus.cpu_read_u8(0x1234, false), 0x1);
         assert_eq!(cpu.y, 0x0);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
@@ -194,7 +194,7 @@ mod tests {
         bus.cpu_write_u8(0x1235, 0x2);
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
-        assert_eq!(bus.cpu_read_u8(0x1235), 0x1);
+        assert_eq!(bus.cpu_read_u8(0x1235, false), 0x1);
         assert_eq!(cpu.y, 0x0);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
@@ -212,7 +212,7 @@ mod tests {
         let cycles = cpu.execute_instruction(opcode.opcode, &mut bus);
         assert_eq!(cycles, opcode.cycles);
         assert_eq!(cpu.y, 0x0);
-        assert_eq!(bus.cpu_read_u8(0x1333), 0x1);
+        assert_eq!(bus.cpu_read_u8(0x1333, false), 0x1);
         assert_eq!(cpu.flags, 0b0000_0000);
         assert_eq!(cpu.pc, 0x0803);
         assert_eq!(cpu.sp, 0xff);

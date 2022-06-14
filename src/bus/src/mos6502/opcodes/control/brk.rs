@@ -17,7 +17,7 @@ pub fn brk(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
     cpu.stack_push(cpu.flags, bus);
     cpu.clear_flag(Break);
 
-    cpu.pc = bus.cpu_read_u16(0xFFFE);
+    cpu.pc = bus.cpu_read_u16(0xFFFE, false);
     0
 }
 
@@ -55,8 +55,8 @@ mod tests {
         assert_eq!(cpu.y, 0);
         assert_eq!(cpu.pc, 0x1234);
         assert_eq!(cpu.sp, 0xfc);
-        assert_eq!(bus.cpu_read_u16(0xFFFE), 0x1234); // check memory is intact
-        assert_eq!(bus.cpu_read_u16(0x01FE), 0x0801); // check right pc is pushed to stack
-        assert_eq!(bus.cpu_read_u8(0x01FD), 0b0001_0111); // check right pc is pushed to stack
+        assert_eq!(bus.cpu_read_u16(0xFFFE, false), 0x1234); // check memory is intact
+        assert_eq!(bus.cpu_read_u16(0x01FE, false), 0x0801); // check right pc is pushed to stack
+        assert_eq!(bus.cpu_read_u8(0x01FD, false), 0b0001_0111); // check right pc is pushed to stack
     }
 }

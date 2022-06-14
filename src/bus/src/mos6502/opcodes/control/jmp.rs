@@ -8,18 +8,18 @@ pub fn jmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
 
     let addr = match inst.mode {
         Absolute => {
-            bus.cpu_read_u16(cpu.pc + 1)
+            bus.cpu_read_u16(cpu.pc + 1, false)
         },
         Indirect => {
-            let addr_ptr = bus.cpu_read_u16(cpu.pc + 1);
+            let addr_ptr = bus.cpu_read_u16(cpu.pc + 1, false);
             let addr_abs:u16;
 
             if (addr_ptr & 0xFF) == 0xFF {
                 // Simulate page boundary hardware bug
-                addr_abs = ((bus.cpu_read_u8(addr_ptr & 0xFF00) as u16) << 8)  | bus.cpu_read_u8(addr_ptr) as u16;
+                addr_abs = ((bus.cpu_read_u8(addr_ptr & 0xFF00, false) as u16) << 8)  | bus.cpu_read_u8(addr_ptr, false) as u16;
             }else {
                 // Behave normally
-                addr_abs = bus.cpu_read_u16(addr_ptr);
+                addr_abs = bus.cpu_read_u16(addr_ptr, false);
             }
             addr_abs
         },
