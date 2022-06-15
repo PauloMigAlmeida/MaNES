@@ -15,9 +15,12 @@ pub use sta::*;
 pub use adc::*;
 pub use sbc::*;
 
+#[allow(unused_imports)]
 use crate::Bus;
-use crate::mos6502::{Mos6502, Instruction, Flags::*};
+use crate::mos6502::{Flags::*, Instruction, Mos6502};
 #[allow(unused_imports)]
 use crate::mos6502::{AddressingMode::*};
 #[allow(unused_imports)]
-use crate::mos6502::opcodes::{OPTABLE};
+use crate::mos6502::opcodes::OPTABLE;
+#[allow(unused_imports)]
+use crate::traits::MainBusConnection;

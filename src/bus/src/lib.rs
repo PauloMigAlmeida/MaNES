@@ -1,5 +1,6 @@
 use crate::cartridge::Cartridge;
 use crate::rp2c02::PPU;
+use crate::traits::MainBusConnection;
 
 // Notes to myself:
 //     - Implement some sort of subscribe mechanism that allow components to register their
@@ -11,6 +12,7 @@ pub mod mos6502;
 pub mod rp2c02;
 pub mod inesformat;
 pub mod cartridge;
+pub mod traits;
 
 const RAM_SIZE: u16 = 0x0800; // CPU has a whopping 2KB RAM
 // const MAX_ROM_SIZE: usize = (RAM_SIZE - ROM_START_ADDR) as usize;
@@ -33,44 +35,12 @@ impl Bus {
         }
     }
 
-    pub fn cpu_read_u8(&self, addr: u16, read_only: bool) -> u8 {
-        if addr <= 0x1FFF {
-            return self.cpu_ram[(addr & 0x07FF) as usize]
-        } else if addr >= 0x2000 && addr <= 0x3FFF {
-            return self.ppu.cpu_read_u8(addr & 0x7, read_only);
-        }
-        panic!("invalid memory address requested... aborting")
-    }
-
     pub fn cpu_read_u8_slice(&self, from: u16, to: u16) -> &[u8] {
         if from <= 0x1FFF && to <= 0x1FFF && from < to {
             return &self.cpu_ram[((from & 0x07FF) as usize)..((to & 0x07FF) as usize)]
         }
         //TODO implement ppu cpu read if necessary (doesn't seem like it but we never know)
         panic!("invalid memory range requested... aborting")
-    }
-
-    pub fn cpu_read_u16(&self, addr: u16, read_only: bool) -> u16 {
-        let low = self.cpu_read_u8(addr, read_only);
-        let high = self.cpu_read_u8(addr + 1, read_only);
-        ((high as u16) << 8) | low as u16
-    }
-
-    pub fn cpu_write_u8(&mut self, addr: u16, value: u8) {
-        if addr <= 0x1FFF {
-            self.cpu_ram[(addr & 0x07FF) as usize] = value;
-        } else if addr >= 0x2000 && addr <= 0x3FFF {
-            self.ppu.cpu_write_u8(addr & 0x7, value);
-        }else {
-            panic!("invalid memory address requested... aborting")
-        }
-    }
-
-    pub fn cpu_write_u16(&mut self, addr: u16, value: u16) {
-        let low = (value & 0xff) as u8;
-        let high = ((value >> 8) & 0xff) as u8;
-        self.cpu_write_u8(addr, low);
-        self.cpu_write_u8(addr + 1, high);
     }
 
     pub fn load_cartridge(&mut self, filename: &str) -> Result<(), &str> {
@@ -93,10 +63,32 @@ impl Bus {
     }
 }
 
+impl MainBusConnection for Bus {
+
+    fn cpu_read_u8(&self, addr: u16, read_only: bool) -> u8 {
+        if addr <= 0x1FFF {
+            return self.cpu_ram[(addr & 0x07FF) as usize]
+        } else if addr >= 0x2000 && addr <= 0x3FFF {
+            return self.ppu.cpu_read_u8(addr & 0x7, read_only);
+        }
+        panic!("invalid memory address requested... aborting")
+    }
+
+    fn cpu_write_u8(&mut self, addr: u16, value: u8) {
+        if addr <= 0x1FFF {
+            self.cpu_ram[(addr & 0x07FF) as usize] = value;
+        } else if addr >= 0x2000 && addr <= 0x3FFF {
+            self.ppu.cpu_write_u8(addr & 0x7, value);
+        }else {
+            panic!("invalid memory address requested... aborting")
+        }
+    }
+}
+
 #[cfg(test)]
 mod test{
     use super::*;
-    use std::io::{Write};
+    use std::io::Write;
     use std::os::unix::prelude::*;
     use tempfile::NamedTempFile;
     use filename::file_name;

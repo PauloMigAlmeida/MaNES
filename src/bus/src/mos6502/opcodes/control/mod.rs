@@ -68,8 +68,9 @@ pub use rts::*;
 pub use rti::*;
 
 use crate::Bus;
-use crate::mos6502::{Mos6502, Instruction, Flags::*};
+use crate::mos6502::{Flags::*, Instruction, Mos6502};
 #[allow(unused_imports)]
 use crate::mos6502::{AddressingMode::*};
 #[cfg(test)]
-use crate::mos6502::opcodes::{OPTABLE};
+use crate::mos6502::opcodes::OPTABLE;
+use crate::traits::MainBusConnection;

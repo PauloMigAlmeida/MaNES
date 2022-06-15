@@ -1,6 +1,7 @@
 use gtk4::{TextView, Align, TextBuffer};
 use std::rc::Rc;
 use crate::manes_bus;
+use bus::traits::MainBusConnection;
 
 thread_local!(
     static MANES_MEM_VIEW_TEXTVIEW: Rc<TextView> = Rc::new({

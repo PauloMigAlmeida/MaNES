@@ -1,9 +1,11 @@
 mod opcodes;
 
 pub use crate::Bus;
-use opcodes::{parse_instruction, Flags};
+use opcodes::{Flags, parse_instruction};
 pub use crate::mos6502::opcodes::{AddressingMode, Instruction};
 pub use crate::mos6502::opcodes::OPTABLE;
+pub use crate::traits::MainBusConnection;
+
 const STACK_PAGE:u16 = 0x0100;
 
 #[derive(Debug)]
