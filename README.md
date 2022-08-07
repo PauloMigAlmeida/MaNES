@@ -1,4 +1,6 @@
 # MaNES
+![Code Coverage](https://github.com/PauloMigAlmeida/MaNES/actions/workflows/coverage.yml/badge.svg?branch=main)
+![Unit Tests](https://github.com/PauloMigAlmeida/MaNES/actions/workflows/unittests.yml/badge.svg?branch=main)
 
 MaNES is an experimental NES emulator written from scratch in Rust. This is work in progress and I would expect something to have it "finalised" by the end of 2022.
 
