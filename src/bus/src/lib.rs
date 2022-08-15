@@ -49,7 +49,8 @@ impl Bus {
     }
 
     pub fn reset(&mut self) {
-        //cpu.reset()
+        self.cpu_ram =  [0; RAM_SIZE as usize + 1];
+        self.cartridge.reset();
         self.system_clock = 0;
     }
 
@@ -66,12 +67,14 @@ impl Bus {
 impl MainBusConnection for Bus {
 
     fn cpu_read_u8(&self, addr: u16, read_only: bool) -> u8 {
+        let mut data = 0x0 as u8;
         if addr <= 0x1FFF {
-            return self.cpu_ram[(addr & 0x07FF) as usize]
+            data = self.cpu_ram[(addr & 0x07FF) as usize];
         } else if addr >= 0x2000 && addr <= 0x3FFF {
-            return self.ppu.cpu_read_u8(addr & 0x7, read_only);
+            data = self.ppu.cpu_read_u8(addr & 0x7, read_only);
         }
-        panic!("invalid memory address requested... aborting")
+        data
+        // panic!("invalid memory address requested... aborting")
     }
 
     fn cpu_write_u8(&mut self, addr: u16, value: u8) {

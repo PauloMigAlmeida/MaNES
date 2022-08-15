@@ -7,6 +7,8 @@ pub struct Cartridge {
     mapper_id: u8,
 }
 
+//TODO Cartridge is connected to both Main bus and PPU Bus
+
 impl Cartridge {
     pub fn new() -> Self {
         Cartridge {
@@ -25,6 +27,12 @@ impl Cartridge {
         swap(&mut self.chr_rom, &mut rom.chr_rom);
         self.mapper_id = rom.header.mapper_id();
         Ok(())
+    }
+
+    pub fn reset(&mut self) {
+        self.prg_rom.clear();
+        self.chr_rom.clear();
+        self.mapper_id = 0;
     }
 }
 

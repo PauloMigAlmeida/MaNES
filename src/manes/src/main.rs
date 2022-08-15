@@ -12,6 +12,7 @@ use ui::textview::rom_disassembly::manes_rom_disassembly_textview;
 use ui::textview::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textview};
 use ui::textview::mem_view::manes_mem_view_textview;
 use ui::button::load_rom::{manes_load_rom_button, load_rom_button_events_setup};
+use ui::button::reset::{load_reset_button_events_setup, manes_reset_button};
 use ui::globals::{manes_app, manes_bus, manes_cpu};
 use ui::window::{manes_main_ui, DEFAULT_WINDOW_WIDTH};
 
@@ -53,7 +54,6 @@ fn build_ui(_app: &Application) {
 }
 
 fn build_top_bar(window: &ApplicationWindow) -> Box {
-    let reset_button = Button::builder().name("reset").label("Reset").build();
     let save_state_button = Button::builder()
         .name("savestate")
         .label("Save State")
@@ -78,29 +78,30 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
         .build();
 
     menu_bar.append(manes_load_rom_button().as_ref());
-    menu_bar.append(&reset_button);
+    menu_bar.append(manes_reset_button().as_ref());
     menu_bar.append(&save_state_button);
     menu_bar.append(&load_state_button);
     menu_bar.append(&about_button);
 
     load_rom_button_events_setup(&window);
+    load_reset_button_events_setup(&window);
 
-    reset_button.connect_clicked(clone!(@strong window =>
-        move |_| {
-            println!("{}", window.width());
-            println!("{}", window.height());
-            // manes_cpu()
-            //     .as_ref()
-            //     .borrow_mut().stack_push(0x10, manes_bus().as_ref().borrow_mut().deref_mut());
-
-            manes_cpu_regs_textview()
-                .as_ref()
-                .set_buffer(Some(&TextBuffer::builder()
-                                    .text(cpu_register_curr_state().as_str())
-                                    .build())
-                );
-        }
-    ));
+    // save_state_button.connect_clicked(clone!(@strong window =>
+    //     move |_| {
+    //         println!("{}", window.width());
+    //         println!("{}", window.height());
+    //         // manes_cpu()
+    //         //     .as_ref()
+    //         //     .borrow_mut().stack_push(0x10, manes_bus().as_ref().borrow_mut().deref_mut());
+    // 
+    //         manes_cpu_regs_textview()
+    //             .as_ref()
+    //             .set_buffer(Some(&TextBuffer::builder()
+    //                                 .text(cpu_register_curr_state().as_str())
+    //                                 .build())
+    //             );
+    //     }
+    // ));
 
     menu_bar
 }
