@@ -1,10 +1,9 @@
 use gtk4::gdk::Display;
-use gtk4::glib::clone;
 use gtk4::prelude::*;
 use gtk4::{
     Align, Application, ApplicationWindow, Box, Button, CssProvider,
     GLArea, Orientation, Paned, PolicyType, ScrolledWindow,
-    StyleContext, TextBuffer,
+    StyleContext,
 };
 mod ui;
 
@@ -13,7 +12,7 @@ use ui::textview::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textvi
 use ui::textview::mem_view::manes_mem_view_textview;
 use ui::button::load_rom::{manes_load_rom_button, load_rom_button_events_setup};
 use ui::button::reset::{load_reset_button_events_setup, manes_reset_button};
-use ui::globals::{manes_app, manes_bus, manes_cpu};
+use ui::globals::{manes_app, manes_bus};
 use ui::window::{manes_main_ui, DEFAULT_WINDOW_WIDTH};
 
 fn main() {
@@ -84,7 +83,7 @@ fn build_top_bar(window: &ApplicationWindow) -> Box {
     menu_bar.append(&about_button);
 
     load_rom_button_events_setup(&window);
-    load_reset_button_events_setup(&window);
+    load_reset_button_events_setup();
 
     // save_state_button.connect_clicked(clone!(@strong window =>
     //     move |_| {

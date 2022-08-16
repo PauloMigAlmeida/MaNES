@@ -1,7 +1,8 @@
 use gtk4::{TextView, Align, TextBuffer};
 use std::{rc::Rc};
+use std::borrow::Borrow;
 
-use crate::manes_cpu;
+use crate::manes_bus;
 
 thread_local!(
     static MANES_CPU_REGS_TEXTVIEW: Rc<TextView> = Rc::new({
@@ -24,8 +25,9 @@ pub fn manes_cpu_regs_textview() -> Rc<TextView> {
 }
 
 pub fn cpu_register_curr_state() -> String {
-    let rc_cpu = manes_cpu();
-    let cpu = rc_cpu.as_ref().borrow();
+    let rc_cpu = manes_bus();
+    let bus = rc_cpu.as_ref().borrow();
+    let cpu = bus.cpu.borrow();
 
     let mut content = String::new();
     content.push_str("[CPU Registers]\n\n");

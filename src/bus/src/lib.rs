@@ -1,4 +1,5 @@
 use crate::cartridge::Cartridge;
+use crate::mos6502::Mos6502;
 use crate::rp2c02::PPU;
 use crate::traits::MainBusConnection;
 
@@ -23,6 +24,7 @@ pub struct Bus {
     system_clock: u64,
     cartridge: Cartridge,
     ppu: PPU,
+    pub cpu: Mos6502,
 }
 
 impl Bus {
@@ -32,6 +34,7 @@ impl Bus {
             system_clock: 0,
             cartridge: Cartridge::new(),
             ppu: PPU::new(),
+            cpu: Mos6502::new(),
         }
     }
 
@@ -50,6 +53,11 @@ impl Bus {
 
     pub fn reset(&mut self) {
         self.cpu_ram =  [0; RAM_SIZE as usize + 1];
+        {
+            let mut new_cpu = self.cpu.clone();
+            new_cpu.reset(self);
+            self.cpu = new_cpu;
+        }
         self.cartridge.reset();
         self.system_clock = 0;
     }
@@ -67,10 +75,10 @@ impl Bus {
 impl MainBusConnection for Bus {
 
     fn cpu_read_u8(&self, addr: u16, read_only: bool) -> u8 {
-        let mut data = 0x0 as u8;
+        let mut data = 0x0_u8;
         if addr <= 0x1FFF {
             data = self.cpu_ram[(addr & 0x07FF) as usize];
-        } else if addr >= 0x2000 && addr <= 0x3FFF {
+        } else if (0x2000..=0x3FFF).contains(&addr) {
             data = self.ppu.cpu_read_u8(addr & 0x7, read_only);
         }
         data
@@ -80,7 +88,7 @@ impl MainBusConnection for Bus {
     fn cpu_write_u8(&mut self, addr: u16, value: u8) {
         if addr <= 0x1FFF {
             self.cpu_ram[(addr & 0x07FF) as usize] = value;
-        } else if addr >= 0x2000 && addr <= 0x3FFF {
+        } else if (0x2000..=0x3FFF).contains(&addr) {
             self.ppu.cpu_write_u8(addr & 0x7, value);
         }else {
             panic!("invalid memory address requested... aborting")
