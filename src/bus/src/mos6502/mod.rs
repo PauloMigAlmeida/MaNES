@@ -8,7 +8,7 @@ pub use crate::traits::MainBusConnection;
 
 const STACK_PAGE:u16 = 0x0100;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Mos6502 {
     pub a: u8,
     pub x: u8,
@@ -35,9 +35,9 @@ impl Mos6502 {
         }
     }
 
-    pub fn reset(&mut self, bus: & Bus) {
+    pub fn reset(&mut self, bus: &Bus) {
         // Get address to set program counter to
-        self.pc = bus.cpu_read_u16(0xFFFC, false);
+        self.pc = bus.cpu_read_u16(0xFFFC, true);
 
         // reset regs
         self.a = 0;
@@ -99,8 +99,7 @@ impl Mos6502 {
 
         self.sp += 1;
         let addr: u16 = STACK_PAGE | self.sp  as u16;
-        let value = bus.cpu_read_u8(addr, false);
-        value
+        bus.cpu_read_u8(addr, false)
     }
 
     // Notes to myself
