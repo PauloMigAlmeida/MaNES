@@ -1,7 +1,7 @@
 mod opcodes;
 
 pub use crate::Bus;
-use opcodes::{Flags, parse_instruction};
+use opcodes::{Flags, Flags::*, parse_instruction};
 pub use crate::mos6502::opcodes::{AddressingMode, Instruction};
 pub use crate::mos6502::opcodes::OPTABLE;
 pub use crate::traits::MainBusConnection;
@@ -51,6 +51,25 @@ impl Mos6502 {
         // Reset takes time
         self.cycles = 8;
     }
+
+    //TODO implement irq
+
+    //TODO implement tests for nmi
+    pub fn nmi(&mut self, bus: &mut Bus) {
+        self.stack_push(((self.pc >> 8) & 0xff) as u8, bus);
+        self.stack_push((self.pc & 0xff) as u8, bus);
+
+        self.clear_flag(Break);
+        self.set_flag(Unused);
+        self.set_flag(DisableInterrupt);
+        self.stack_push(self.flags, bus);
+
+        self.pc = bus.cpu_read_u16(0xFFFA, true);
+        self.cycles = 8;
+
+    }
+
+    //TODO implement clock
 
     pub fn execute_instruction(&mut self, opcode: u8, bus: &mut Bus) -> u8 {
         let inst = parse_instruction(opcode);
@@ -276,7 +295,7 @@ mod tests {
         cpu.stack_pull(&bus);
     }
 
-    // TODO implement vectors otherise this test will fail
+    // TODO implement vectors otherwise this test will fail
     #[test]
     #[ignore]
     fn test_cpu_reset() {
