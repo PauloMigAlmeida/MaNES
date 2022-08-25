@@ -329,7 +329,7 @@ pub const OPTABLE: [Instruction;256] = [
 
 
 pub fn parse_instruction(opcode: u8) -> Instruction<'static> {
-    OPTABLE[opcode as usize].clone()
+    OPTABLE[opcode as usize]
 }
 
 #[cfg(test)]

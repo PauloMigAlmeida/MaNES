@@ -5,6 +5,7 @@ use std::rc::Rc;
 use crate::{manes_bus};
 use crate::ui::textview::rom_disassembly::{rom_disassembly_curr_state,manes_rom_disassembly_textview};
 use crate::ui::textview::mem_view::{mem_view_curr_state, manes_mem_view_textview};
+use crate::ui::textview::cpu_registers::{cpu_register_curr_state, manes_cpu_regs_textview};
 use bus::ROM_START_ADDR;
 
 thread_local!(
@@ -58,11 +59,11 @@ pub fn load_rom_button_events_setup(window: &ApplicationWindow) {
                                     .build())
                                 );
 
-                            manes_rom_disassembly_textview()
+                            manes_cpu_regs_textview()
                                 .as_ref()
                                 .set_buffer(Some(&TextBuffer::builder()
-                                    .text(rom_disassembly_curr_state().as_str())
-                                    .build())
+                                                    .text(cpu_register_curr_state().as_str())
+                                                    .build())
                                 );
 
                             manes_mem_view_textview()
@@ -74,7 +75,7 @@ pub fn load_rom_button_events_setup(window: &ApplicationWindow) {
                             println!("Done");
                         },
                         ResponseType::Cancel => println!("Chose Cancel"),
-                        _ => println!("Chose close"),
+                        _ => println!("Chose file"),
                     }
                     dialog.close();
                 });

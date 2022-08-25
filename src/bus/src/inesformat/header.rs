@@ -61,7 +61,7 @@ impl Header {
         }
     }
 
-    pub fn from(content: &Vec<u8>) -> Result<Self, &str> {
+    pub fn from(content: &[u8]) -> Result<Self, &str> {
         let mut ret = Header::new();
 
         let magic_const = &content[0..4];

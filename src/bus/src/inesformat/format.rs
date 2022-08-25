@@ -34,7 +34,7 @@ impl INESFormat {
     pub fn from(filename: &str) -> Result<Self, &str> {
         let mut rom = INESFormat::new();
         let bytes = rom.read_file(filename).expect("err reading file");
-        let mut pos = 0 as usize;
+        let mut pos = 0;
 
         rom.header = Header::from(&bytes).expect("invalid iNES Header");
         pos += 16;

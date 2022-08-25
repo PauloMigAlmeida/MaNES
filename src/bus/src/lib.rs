@@ -1,5 +1,7 @@
 use crate::cartridge::Cartridge;
+use crate::mos6502::Mos6502;
 use crate::rp2c02::PPU;
+use crate::traits::MainBusConnection;
 
 // Notes to myself:
 //     - Implement some sort of subscribe mechanism that allow components to register their
@@ -11,6 +13,7 @@ pub mod mos6502;
 pub mod rp2c02;
 pub mod inesformat;
 pub mod cartridge;
+pub mod traits;
 
 const RAM_SIZE: u16 = 0x0800; // CPU has a whopping 2KB RAM
 // const MAX_ROM_SIZE: usize = (RAM_SIZE - ROM_START_ADDR) as usize;
@@ -21,6 +24,7 @@ pub struct Bus {
     system_clock: u64,
     cartridge: Cartridge,
     ppu: PPU,
+    pub cpu: Mos6502,
 }
 
 impl Bus {
@@ -30,16 +34,8 @@ impl Bus {
             system_clock: 0,
             cartridge: Cartridge::new(),
             ppu: PPU::new(),
+            cpu: Mos6502::new(),
         }
-    }
-
-    pub fn cpu_read_u8(&self, addr: u16, read_only: bool) -> u8 {
-        if addr <= 0x1FFF {
-            return self.cpu_ram[(addr & 0x07FF) as usize]
-        } else if addr >= 0x2000 && addr <= 0x3FFF {
-            return self.ppu.cpu_read_u8(addr & 0x7, read_only);
-        }
-        panic!("invalid memory address requested... aborting")
     }
 
     pub fn cpu_read_u8_slice(&self, from: u16, to: u16) -> &[u8] {
@@ -50,36 +46,19 @@ impl Bus {
         panic!("invalid memory range requested... aborting")
     }
 
-    pub fn cpu_read_u16(&self, addr: u16, read_only: bool) -> u16 {
-        let low = self.cpu_read_u8(addr, read_only);
-        let high = self.cpu_read_u8(addr + 1, read_only);
-        ((high as u16) << 8) | low as u16
-    }
-
-    pub fn cpu_write_u8(&mut self, addr: u16, value: u8) {
-        if addr <= 0x1FFF {
-            self.cpu_ram[(addr & 0x07FF) as usize] = value;
-        } else if addr >= 0x2000 && addr <= 0x3FFF {
-            self.ppu.cpu_write_u8(addr & 0x7, value);
-        }else {
-            panic!("invalid memory address requested... aborting")
-        }
-    }
-
-    pub fn cpu_write_u16(&mut self, addr: u16, value: u16) {
-        let low = (value & 0xff) as u8;
-        let high = ((value >> 8) & 0xff) as u8;
-        self.cpu_write_u8(addr, low);
-        self.cpu_write_u8(addr + 1, high);
-    }
-
     pub fn load_cartridge(&mut self, filename: &str) -> Result<(), &str> {
         self.cartridge.load(filename).expect("failed to load cartridge");
         Ok(())
     }
 
     pub fn reset(&mut self) {
-        //cpu.reset()
+        self.cpu_ram =  [0; RAM_SIZE as usize + 1];
+        {
+            let mut new_cpu = self.cpu.clone();
+            new_cpu.reset(self);
+            self.cpu = new_cpu;
+        }
+        self.cartridge.reset();
         self.system_clock = 0;
     }
 
@@ -93,58 +72,29 @@ impl Bus {
     }
 }
 
-#[cfg(test)]
-mod test{
-    use super::*;
-    use std::io::{Write};
-    use std::os::unix::prelude::*;
-    use tempfile::NamedTempFile;
-    use filename::file_name;
-    use crate::inesformat::format::{CHR_ROM_SIZE_FACTOR, PRG_ROM_SIZE_FACTOR};
+impl MainBusConnection for Bus {
 
-    pub fn generate_rom(add_trainer: bool, mapper_id: u8, ines_file_version: u8) -> (NamedTempFile, String) {
-        let mut tmp_file = NamedTempFile::new().unwrap();
-
-        // header
-        let mut contents:Vec<u8> = vec![
-            0x4E,
-            0x45,
-            0x53,
-            0x1A,
-            1,
-            1,
-            (mapper_id & 0x0F) << 4, // flag6
-            (mapper_id & 0xF0),      // flag7
-            0, 0, 0, 0, 0, 0, 0, 0];
-
-        if add_trainer {
-            contents[6] |= 0x4;
-            contents.resize(contents.len() + 512, 0xFF);
+    fn cpu_read_u8(&self, addr: u16, read_only: bool) -> u8 {
+        let mut data = 0x0_u8;
+        if addr <= 0x1FFF {
+            data = self.cpu_ram[(addr & 0x07FF) as usize];
+        } else if (0x2000..=0x3FFF).contains(&addr) {
+            data = self.ppu.cpu_read_u8(addr & 0x7, read_only);
         }
-
-        if ines_file_version == 1 {
-            //  prg_rom
-            contents.resize(contents.len() + contents[4] as usize * PRG_ROM_SIZE_FACTOR, 0xEE);
-
-            //  chr_rom
-            contents.resize(contents.len() + contents[5] as usize * CHR_ROM_SIZE_FACTOR, 0xDD);
-        } else if ines_file_version == 2 {
-            contents[7] |= 0x08;
-        }
-
-        tmp_file.write_all(contents.as_slice()).expect("failed to write");
-
-        // filename
-        let filename = file_name(&tmp_file.as_raw_fd()).unwrap();
-        let os_str = filename.into_os_string();
-
-        (tmp_file, String::from(os_str.to_str().unwrap()))
+        data
+        // panic!("invalid memory address requested... aborting")
     }
 
-    #[test]
-    fn test_memory_is_zeroed() {
-        let bus = Bus::new();
-        assert_eq!(&[0; RAM_SIZE as usize + 1], &bus.cpu_ram[..]);
+    fn cpu_write_u8(&mut self, addr: u16, value: u8) {
+        if addr <= 0x1FFF {
+            self.cpu_ram[(addr & 0x07FF) as usize] = value;
+        } else if (0x2000..=0x3FFF).contains(&addr) {
+            self.ppu.cpu_write_u8(addr & 0x7, value);
+        }else {
+            panic!("invalid memory address requested... aborting")
+        }
     }
-
 }
+
+#[cfg(test)]
+mod test;

@@ -12,16 +12,13 @@ pub fn jmp(cpu: &mut Mos6502, inst: Instruction, bus: &mut Bus) -> u8 {
         },
         Indirect => {
             let addr_ptr = bus.cpu_read_u16(cpu.pc + 1, false);
-            let addr_abs:u16;
-
             if (addr_ptr & 0xFF) == 0xFF {
                 // Simulate page boundary hardware bug
-                addr_abs = ((bus.cpu_read_u8(addr_ptr & 0xFF00, false) as u16) << 8)  | bus.cpu_read_u8(addr_ptr, false) as u16;
+                ((bus.cpu_read_u8(addr_ptr & 0xFF00, false) as u16) << 8)  | bus.cpu_read_u8(addr_ptr, false) as u16
             }else {
                 // Behave normally
-                addr_abs = bus.cpu_read_u16(addr_ptr, false);
+                bus.cpu_read_u16(addr_ptr, false)
             }
-            addr_abs
         },
         _ => unreachable!("invalid addressing mode for instruction")
     };

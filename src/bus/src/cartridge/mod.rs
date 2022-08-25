@@ -7,6 +7,8 @@ pub struct Cartridge {
     mapper_id: u8,
 }
 
+//TODO Cartridge is connected to both Main bus and PPU Bus
+
 impl Cartridge {
     pub fn new() -> Self {
         Cartridge {
@@ -25,6 +27,12 @@ impl Cartridge {
         swap(&mut self.chr_rom, &mut rom.chr_rom);
         self.mapper_id = rom.header.mapper_id();
         Ok(())
+    }
+
+    pub fn reset(&mut self) {
+        self.prg_rom.clear();
+        self.chr_rom.clear();
+        self.mapper_id = 0;
     }
 }
 
@@ -61,5 +69,20 @@ mod test {
         cartridge.load(filename.as_str()).expect("Failed loading file");
 
         assert_eq!(cartridge.mapper_id, 0xfe);
+    }
+
+    #[test]
+    fn test_reset_cartridge() {
+        let (_tmp_file, filename) = generate_rom(false, 0, 1);
+        let mut cartridge = Cartridge::new();
+        cartridge.load(filename.as_str()).expect("Failed loading file");
+        assert_eq!(&[0xEE as u8; 1 * PRG_ROM_SIZE_FACTOR], &cartridge.prg_rom[..]);
+        assert_eq!(&[0xDD as u8; 1 * CHR_ROM_SIZE_FACTOR], &cartridge.chr_rom[..]);
+
+        cartridge.reset();
+        assert_eq!(cartridge.prg_rom.len(), 0);
+        assert_eq!(cartridge.chr_rom.len(), 0);
+        assert_eq!(cartridge.mapper_id, 0);
+
     }
 }
